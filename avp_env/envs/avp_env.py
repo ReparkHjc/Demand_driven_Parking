@@ -9,11 +9,13 @@ class AutonomousParkingEnv(gym.Env):
     def __init__(self, args=[]):
         super(AutonomousParkingEnv, self).__init__()
         self.env_type = 'train'
-        self.image_shape = (128, 400, 3)
-        self.max_string_length = 64
+        self.image_raw_shape = (270, 480, 3)
+        self.max_string_length = 512
+        # self.image_shape = (4, 270, 480, 3)
+        self.image_shape = (270, 480, 12)
 
         # Initialize helpers
-        self.image_loader = ImageLoader(self.env_type, self.image_shape)
+        self.image_loader = ImageLoader(self.env_type, self.image_raw_shape)
         self.data_reader = DataReader(self.env_type)
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
@@ -26,12 +28,12 @@ class AutonomousParkingEnv(gym.Env):
 
         # Define observation space
         self.observation_space = spaces.Tuple((
-            spaces.Box(low=0, high=255, shape=self.image_shape, dtype=np.uint8),
-            spaces.Box(low=0, high=99999, shape=(self.max_string_length,), dtype=np.int64)
+            spaces.Box(low=0, high=255, shape=self.image_shape, dtype=np.uint8),  # 4张图
+            spaces.Box(low=0, high=99999, shape=(self.max_string_length,), dtype=np.int64)  # 指令token
         ))
 
         # Define action space
-        self.action_space = spaces.Discrete(7)
+        self.action_space = spaces.Discrete(3)
 
         # Initialize state
         self.current_observation = (
@@ -45,7 +47,7 @@ class AutonomousParkingEnv(gym.Env):
             perfect_trajectory = [0] * (trajectory.path_id - 1)
             perfect_trajectory.append(trajectory.loc_id)
         else:
-            perfect_trajectory = [0] * 29
+            perfect_trajectory = [0] * int(trajectory.path_num)
         return perfect_trajectory
 
 
@@ -61,14 +63,13 @@ class AutonomousParkingEnv(gym.Env):
         self.inital_instruction = np.array(instruction_tokens)
 
         self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
-        if self.current_position < 10:
-            self.render_observation = self.render_image[f"{self.target_instruction.scan}/DJI_0{self.current_position}.JPG"]
-            self.current_observation = (
-            self.image_data[f"{self.target_instruction.scan}/DJI_0{self.current_position}.JPG"], self.inital_instruction)
-        else:
-            self.render_observation = self.render_image[f"{self.target_instruction.scan}/DJI_{self.current_position}.JPG"]
-            self.current_observation = (
-            self.image_data[f"{self.target_instruction.scan}/DJI_{self.current_position}.JPG"], self.inital_instruction)
+
+        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{(self.current_position-1):06d}.jpg"
+        self.render_observation = self.render_image[key]
+        self.current_observation = (
+            self.image_data[key], self.inital_instruction
+        )
+
         return self.current_observation
 
     def getPerfectTraj(self):
@@ -86,15 +87,15 @@ class AutonomousParkingEnv(gym.Env):
     def step(self, action):
 
         # Execute action and return reward, next observation, whether to terminate, debugging information
-        if self.current_position > 29:
+        if self.current_position > int(self.target_instruction.path_num):
             reward = -1
             done = True
             self.CurrentParkingSlot = []
-        elif action == 0 and self.current_position != 29:
+        elif action == 0 and self.current_position != int(self.target_instruction.path_num):
             reward = 0
             self.current_position += 1
             done = False
-        elif action == 0 and self.current_position == 29:
+        elif action == 0 and self.current_position == int(self.target_instruction.path_num):
             reward = -1
             done = True
             self.CurrentParkingSlot = []
@@ -106,16 +107,12 @@ class AutonomousParkingEnv(gym.Env):
             else:
                 reward = 0
 
+        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{(self.current_position-1):06d}.jpg"
 
-        if self.current_position < 10:
-            self.render_observation = self.render_image[f"{self.target_instruction.scan}/DJI_0{self.current_position}.JPG"]
-            self.current_observation = (
-            self.image_data[f"{self.target_instruction.scan}/DJI_0{self.current_position}.JPG"], self.inital_instruction)
-        else:
-            self.render_observation = self.render_image[f"{self.target_instruction.scan}/DJI_{self.current_position}.JPG"]
-            self.current_observation = (self.image_data[f"{self.target_instruction.scan}/DJI_{self.current_position}.JPG"],
-                                    self.inital_instruction)
-        # self.current_observation = (np.zeros(self.image_shape, dtype=np.uint8), np.zeros(self.max_string_length, dtype=np.uint8))
+        self.render_observation = self.render_image[key]
+        self.current_observation = (
+            self.image_data[key], self.inital_instruction
+        )
 
         info = {}
 
@@ -165,7 +162,7 @@ class MetricsEnv(AutonomousParkingEnv):
         self.trajectory_index = 0  # Initialize trajectory index
         self.traj_len = len(self.trajectories)
         # Initialize helpers
-        self.image_loader = ImageLoader(self.env_type, self.image_shape)
+        self.image_loader = ImageLoader(self.env_type, self.image_raw_shape)
         self.data_reader = DataReader(self.env_type)
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
@@ -197,13 +194,11 @@ class MetricsEnv(AutonomousParkingEnv):
 
         self.inital_instruction = np.array(instruction_tokens)
         self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
-        if self.current_position < 10:
-            self.render_observation = self.render_image[f"{self.target_instruction.scan}/DJI_0{self.current_position}.JPG"]
-            self.current_observation = (
-            self.image_data[f"{self.target_instruction.scan}/DJI_0{self.current_position}.JPG"], self.inital_instruction)
-        else:
-            self.render_observation = self.render_image[f"{self.target_instruction.scan}/DJI_{self.current_position}.JPG"]
-            self.current_observation = (
-            self.image_data[f"{self.target_instruction.scan}/DJI_{self.current_position}.JPG"], self.inital_instruction)
+
+        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{self.current_position:06d}.jpg"
+        self.render_observation = self.render_image[key]
+        self.current_observation = (
+            self.image_data[key], self.inital_instruction
+        )
 
         return self.current_observation

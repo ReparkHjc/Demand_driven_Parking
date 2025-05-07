@@ -15,7 +15,7 @@ register(
 )
 
 # Initialise Ray
-ray.init()
+ray.init(num_gpus=0)
 
 # Algorithm Configuration List
 algorithm_configs = {
@@ -35,18 +35,26 @@ total_timesteps = 100000
 
 def run_algorithm(algo_config, algo_name, total_timesteps):
     checkpoint_dir = f"../checkpoints/{algo_name}"
+    log_dir = f"../logs/{algo_name}"
+
     os.makedirs(checkpoint_dir, exist_ok=True)
     algo_config = algo_config.training(gamma=0.9, lr=0.01)
     algo_config = algo_config.resources(num_gpus=0)
     algo_config = algo_config.rollouts(num_rollout_workers=num_workers)
     algo_config = algo_config.environment(env=AutonomousParkingEnv)
 
-    algo_config.replay_buffer_config["capacity"] = 10000  # reduce replay buffer
+    algo_config.replay_buffer_config["capacity"] = 2000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
     # algo_config = algo_config.model(conv_filters=conv_filters)
     algo_config.model["conv_filters"] = conv_filters_1
+
+    # Add logger config for TensorBoard
+    algo_config = algo_config.debugging(log_level="INFO", logger_config={
+        "type": "ray.tune.logger.UnifiedLogger",
+        "logdir": log_dir,
+    })
 
     algo = algo_config.build()
 

@@ -2,7 +2,7 @@ from gymnasium import spaces
 import random
 class RandomAgent():
     def __init__(self):
-        self.action_space = spaces.Discrete(7)  # discrete action space
+        self.action_space = spaces.Discrete(3)  # discrete action space
 
     def get_action(self, observation):
         action = self.action_space.sample() if random.random() <= 0.1 else 0
@@ -19,7 +19,7 @@ class RulebasedAgent():
             self.mode = "Random"  # 100% Random, 0% Optimal
         else:
             self.mode = "Normal"  # 50% Random, 50% Optimal
-        self.action_space = spaces.Discrete(7)  # discrete action space
+        self.action_space = spaces.Discrete(3)  # discrete action space
 
     def get_action(self, perfect_trajectory, current_position):
 

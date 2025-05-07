@@ -38,9 +38,11 @@ class DataReader:
         if env_type == 'train':
             instruction_name = 'target_command.json'
         elif env_type == 'test':
-            instruction_name = 'test_command.json'
+            # instruction_name = 'test_command.json'
+            instruction_name = 'target_command.json'
         else:
             instruction_name = ''
-        instruction_data = self._load_json('../data/commands', instruction_name)
+        # instruction_data = self._load_json('../data/commands', instruction_name)
+        instruction_data = self._load_json('D:/1Epan/TJ_VLP_V2/data/Command', instruction_name)
 
         return [Instruction(instruction_entry) for instruction_entry in instruction_data]
