@@ -36,8 +36,8 @@ def get_target_features(env):
             "ParkingID": parking_id,
             "loc_id": slot['LocID'],
             "distance": slot['PathID'],
-            "park_id": slot["park_id"],
-            "path_num": slot["path_num"]
+            "park_id": instruction_info.park_id,
+            "path_num": instruction_info.path_num
         }
         results.append(result)
 
