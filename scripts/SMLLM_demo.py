@@ -1,39 +1,27 @@
-# demo.py
+from avp_env.envs.avp_env import MetricsVLLMEnv
+from avp_env.agents.LLM_agent import combineMultimodalLLMAgent
+from avp_env.agents.image_process import combine_views, split_multi_view_image
 
-from avp_env.envs.avp_env import AutonomousParkingEnv
-from avp_env.agents.LLM_agent import multiImgMultimodalLLMAgent
 from PIL import Image
 import numpy as np
-from avp_env.agents.image_process import split_multi_view_image
 
+env = MetricsVLLMEnv()
+agent = combineMultimodalLLMAgent()
 
-def main():
-    # 初始化环境和 agent
-    env = AutonomousParkingEnv()
-    agent = multiImgMultimodalLLMAgent(api_key="your-openai-api-key")
+state = env.reset()
+done = False
+total_reward = 0
+instruction = env.getTargetInstruction().instruction
 
-    state = env.reset()
-    instruction = env.getTargetInstruction().instruction
-    done = False
-    total_reward = 0
+while not done:
+    position = env.getPosition()
+    img_np = env.render()[0]  # HWC image as numpy
+    front_img, left_img, right_img, back_img = split_multi_view_image(img_np)
+    img = right_img
 
-    while not done:
-        position = env.getPosition()
-        img_array = env.render()[0]  # shape: (H, W, 12)
-        front_img, left_img, right_img, back_img = split_multi_view_image(img_array)
+    action = agent.get_action(img, instruction, position)
+    state, reward, done, info = env.step(action)
+    total_reward += reward
+    print(f"[pos={position}] action={action}, reward={reward}")
 
-        views = [front_img, left_img, right_img, back_img]
-
-        # 使用 agent 推理动作
-        action = agent.get_action(views, instruction, position)
-
-        # 执行动作
-        state, reward, done, info = env.step(action)
-        total_reward += reward
-
-        print(f"[Position {position}] Action: {action}, Reward: {reward}")
-
-    print(f"\n🎯 Final total reward: {total_reward}")
-
-if __name__ == "__main__":
-    main()
+print("总奖励:", total_reward)
