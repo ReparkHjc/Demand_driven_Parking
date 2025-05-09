@@ -11,8 +11,8 @@ def meets_criteria(slot, tags):
             return False
     return True
 
-def get_result_tags(result_id, result_path):
-    with open(f'./data/{result_path}/parking_slots.json', 'r') as f:
+def get_result_tags(result_id, result_park, result_path):
+    with open(f'../data/Vision/Park_{result_park}/{result_path}/parking_slots.json', 'r') as f:
         parking_slots = json.load(f)
     return next((slot for slot in parking_slots if slot['ParkingID'] == result_id), None)
 
@@ -22,7 +22,7 @@ def get_target_features(env):
     matching_slots = []
 
     if hasattr(instruction_info, 'tags'):
-        with open(f'./data/{instruction_info.scan}/parking_slots.json', 'r') as f:
+        with open(f'../data/Vision/Park_{instruction_info.park_id}/{instruction_info.scan}/parking_slots.json', 'r') as f:
             parking_slots = json.load(f)
         matching_slots = [slot['ParkingID'] for slot in parking_slots if meets_criteria(slot, instruction_info.tags)]
 
@@ -35,7 +35,9 @@ def get_target_features(env):
             "tags": instruction_info.tags,
             "ParkingID": parking_id,
             "loc_id": slot['LocID'],
-            "distance": (slot['PathID'] - 1) * 3 + (slot['LocID'] - 1) % 3 + 1
+            "distance": slot['PathID'],
+            "park_id": slot["park_id"],
+            "path_num": slot["path_num"]
         }
         results.append(result)
 

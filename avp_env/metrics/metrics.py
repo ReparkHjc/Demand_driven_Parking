@@ -86,9 +86,11 @@ def calculate_navigation_errors(experiments):
         if experiment["target_features"]:
             result_id = experiment["result_id"]
             result_path = experiment["target_features"][0]["scan"]
+            result_park = experiment["target_features"][0]['park_id']
+
             if not result_id:
                 continue
-            result_tags = get_result_tags(result_id, result_path)
+            result_tags = get_result_tags(result_id, result_park, result_path)
             if result_tags["Occupied"] != 0:
                 error_count += 1
 
@@ -258,11 +260,12 @@ def calculate_matching_rate(experiments):
 
             result_id = experiment["result_id"]
             result_path = experiment["target_features"][0]["scan"]
+            result_park = experiment["target_features"][0]['park_id']
 
             if not result_id:
                 continue
             target_tags = experiment["target_features"][0]['tags']
-            result_tags = get_result_tags(result_id, result_path)
+            result_tags = get_result_tags(result_id, result_park, result_path)
             # 跳过没有决策车位或没有用户指令标签的实验
 
             # 计算完全相同的tags数量
@@ -307,11 +310,11 @@ def calculate_weighted_matching_rate(experiments):
 
             result_id = experiment["result_id"]
             result_path = experiment["target_features"][0]["scan"]
-
+            result_park = experiment["target_features"][0]['park_id']
             if not result_id:
                 continue
             target_tags = experiment["target_features"][0]['tags']
-            result_tags = get_result_tags(result_id, result_path)
+            result_tags = get_result_tags(result_id, result_park, result_path)
             # 跳过没有决策车位或没有用户指令标签的实验
             distance = experiment["result_features"]["distance"]
 
