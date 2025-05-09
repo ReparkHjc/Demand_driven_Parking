@@ -4,7 +4,7 @@ from avp_env.agents.image_process import combine_views, split_multi_view_image
 
 
 def get_result_id(env, agent, instructions_index=None):
-    obs = env.resetVLLM(instructions_index)
+    obs = env.reset(instructions_index)
     done = False
     steps = 0
 
