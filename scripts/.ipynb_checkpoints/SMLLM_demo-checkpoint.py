@@ -17,7 +17,7 @@ while not done:
     position = env.getPosition()
     img_np = env.render()[0]  # HWC image as numpy
     front_img, left_img, right_img, back_img = split_multi_view_image(img_np)
-    img = combine_views(front_img, left_img, right_img, back_img)
+    img = right_img
 
     action = agent.get_action(img, instruction, position)
     state, reward, done, info = env.step(action)
