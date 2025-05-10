@@ -40,4 +40,5 @@ if __name__ == "__main__":
                     experiments = run_experiments(env, agent, instru_num, output_file, view)
 
                 metrics = get_parking_metrics(experiments)
-                print(f"Metrics for instr_type '{instr_type}', model '{model}', view '{view}':\n", metrics)
+                print("=" * 20, f"Metrics for instr_type '{instr_type}', model '{model}', view '{view}':\n", metrics,
+                      "=" * 20)
