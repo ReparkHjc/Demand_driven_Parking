@@ -141,15 +141,15 @@ class AutonomousParkingEnv(gym.Env):
                 elif slot.Occupied != 0:
                     reward = -1  # Give a negative punitive reward for not having an empty parking slot
 
-                elif slot.Disabled != self.metrics_instructions.tags['Disabled']:
+                elif slot.Disabled != self.target_instruction.tags['Disabled']:
                     reward = -0.3  # Give a negative punitive reward for parking in the wrong disabled slot
 
-                elif slot.Charging != self.metrics_instructions.tags['Charging']:
+                elif slot.Charging != self.target_instruction.tags['Charging']:
                     reward = -0.2  # Give a negative punitive reward for parking in the wrong charging slot
 
                 else:
                     reward = 1
-                    for key, value in self.metrics_instructions.tags.items():
+                    for key, value in self.target_instruction.tags.items():
                         if getattr(slot, key, None) == value:
                             reward += 0.2  # If the attribute in slot is the same as the target attribute, give a medium reward
 
