@@ -182,7 +182,7 @@ class MetricsVLLMEnv(AutonomousParkingEnv):
             self.target_instruction = self.metrics_instructions[InsIndex]
 
         self.inital_instruction = self.target_instruction.instruction
-
+        print(self.inital_instruction)
         key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
         self.render_observation = self.render_image[key]
         self.current_observation = (
