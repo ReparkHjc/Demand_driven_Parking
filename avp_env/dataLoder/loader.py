@@ -38,11 +38,34 @@ class DataReader:
         if env_type == 'train':
             instruction_name = 'target_command.json'
         elif env_type == 'test':
-            # instruction_name = 'test_command.json'
             instruction_name = 'target_command.json'
+        elif env_type == 'raw':
+            instruction_name = 'raw_command.json'
         else:
-            instruction_name = ''
+            raise ValueError(f"Invalid env_type '{env_type}'. Please check your input.")
         # instruction_data = self._load_json('../data/commands', instruction_name)
         instruction_data = self._load_json('../data/Command', instruction_name)
 
+        for instruction in instruction_data:
+            instruction['tags']['Occupied'] = 0
+
+            # Set 'Disabled' to 0 if 'Disabled' is not in tags
+            if 'Disabled' not in instruction['tags']:
+                instruction['tags']['Disabled'] = 0
+
+            # Set 'Charging' to 0 if 'Charging' is not in tags
+            if 'Charging' not in instruction['tags']:
+                instruction['tags']['Charging'] = 0
+
         return [Instruction(instruction_entry) for instruction_entry in instruction_data]
+
+    def load_vision_path(self):
+        experiment_paths = self.path_loader.load_path()
+        for experiment_path in experiment_paths:
+            park_num = os.path.basename(os.path.dirname(experiment_path))  # Park_1
+            park_id = park_num.split('_')[-1]  # '1'
+
+            experiment_id = os.path.basename(experiment_path)  # 20240423
+            return park_id, experiment_id, park_num
+
+

@@ -4,6 +4,7 @@ from gymnasium import spaces
 from transformers import AutoTokenizer
 from avp_env.dataLoder import ImageLoader, DataReader
 import random
+from avp_env.agents.park_match import load_prefect_park
 
 class AutonomousParkingEnv(gym.Env):
     def __init__(self, args=[]):
@@ -23,8 +24,10 @@ class AutonomousParkingEnv(gym.Env):
         self.image_data = self.image_loader.image_data
         self.render_image = self.image_loader.render_image
         self.parking_slots = self.data_reader.load_parking_slots()
-        self.trajectories = self.data_reader.load_trajectories()
-        # self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
+        # self.trajectories = self.data_reader.load_trajectories()
+        self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
+        self.park_id, self.experiment_id, self.park_num = self.data_reader.load_vision_path()
+
 
         # Define observation space
         self.observation_space = spaces.Tuple((
@@ -50,10 +53,9 @@ class AutonomousParkingEnv(gym.Env):
             perfect_trajectory = [0] * int(trajectory.path_num)
         return perfect_trajectory
 
-
     def reset(self, InsIndex=None):
         self.current_position = 1
-        self.target_instruction = random.choice(self.trajectories)
+        self.target_instruction = random.choice(self.metrics_instructions)
         instruction_tokens = self.tokenizer.encode(
             self.target_instruction.instruction, add_special_tokens=True,
             max_length=self.max_string_length, pad_to_max_length=True,
@@ -62,18 +64,20 @@ class AutonomousParkingEnv(gym.Env):
 
         self.inital_instruction = np.array(instruction_tokens)
 
-        self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
+        # self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
 
-        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{(self.current_position-1):06d}.jpg"
+        key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
         self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
         )
 
+        self.matching_slots = load_prefect_park(self.target_instruction, self.parking_slots)
+
         return self.current_observation
 
-    def getPerfectTraj(self):
-        return self.perfect_trajectory
+    # def getPerfectTraj(self):
+    #     return self.perfect_trajectory
 
     def getPosition(self):
         return self.current_position
@@ -87,27 +91,27 @@ class AutonomousParkingEnv(gym.Env):
     def step(self, action):
 
         # Execute action and return reward, next observation, whether to terminate, debugging information
-        if self.current_position > int(self.target_instruction.path_num):
+        if self.current_position > int(self.park_num):
             reward = -1
             done = True
             self.CurrentParkingSlot = []
-        elif action == 0 and self.current_position != int(self.target_instruction.path_num):
+        elif action == 0 and self.current_position != int(self.park_num):
             reward = 0
             self.current_position += 1
             done = False
-        elif action == 0 and self.current_position == int(self.target_instruction.path_num):
+        elif action == 0 and self.current_position == int(self.park_num):
             reward = -1
             done = True
             self.CurrentParkingSlot = []
         else:
             self.CurrentParkingSlot = self.get_parking_slots(action, self.current_position)
             done = True
-            if hasattr(self.target_instruction, 'ParkingID'):
-                reward = self.getReward(self.CurrentParkingSlot)
-            else:
-                reward = 0
+            # if hasattr(self.target_instruction, 'ParkingID'):
+            reward = self.getReward(self.CurrentParkingSlot)
+            # else:
+            #     reward = 0
 
-        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{(self.current_position-1):06d}.jpg"
+        key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
 
         self.render_observation = self.render_image[key]
         self.current_observation = (
@@ -121,21 +125,21 @@ class AutonomousParkingEnv(gym.Env):
     def getReward(self, CurrentParkingSlot):
         if CurrentParkingSlot:
             for slot in CurrentParkingSlot:
-                if slot.ParkingID == self.target_instruction.ParkingID:
+                if slot.ParkingID in self.matching_slots:
                     reward = 3  # Give a big reward if the current parking space is the same as the target parking slot
 
                 elif slot.Occupied != 0:
                     reward = -1  # Give a negative punitive reward for not having an empty parking slot
 
-                elif slot.Disabled != self.target_instruction.tags['Disabled']:
+                elif slot.Disabled != self.metrics_instructions.tags['Disabled']:
                     reward = -0.3  # Give a negative punitive reward for parking in the wrong disabled slot
 
-                elif slot.Charging != self.target_instruction.tags['Charging']:
+                elif slot.Charging != self.metrics_instructions.tags['Charging']:
                     reward = -0.2  # Give a negative punitive reward for parking in the wrong charging slot
 
                 else:
                     reward = 1
-                    for key, value in self.target_instruction.tags.items():
+                    for key, value in self.metrics_instructions.tags.items():
                         if getattr(slot, key, None) == value:
                             reward += 0.2  # If the attribute in slot is the same as the target attribute, give a medium reward
 
@@ -162,18 +166,19 @@ class MetricsVLLMEnv(AutonomousParkingEnv):
         self.current_position = 1
         if InsIndex == None:
             # Select the next trajectory in sequence
-            self.target_instruction = self.trajectories[self.trajectory_index]
-            self.trajectory_index = (self.trajectory_index + 1) % len(self.trajectories)
+            self.target_instruction = self.metrics_instructions[self.trajectory_index]
+            self.trajectory_index = (self.trajectory_index + 1) % len(self.metrics_instructions)
         else:
-            self.target_instruction = self.trajectories[InsIndex]
+            self.target_instruction = self.metrics_instructions[InsIndex]
 
         self.inital_instruction = self.target_instruction.instruction
 
-        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{(self.current_position-1):06d}.jpg"
+        key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
         self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
         )
+        self.matching_slots = load_prefect_park(self.target_instruction, self.parking_slots)
 
         return self.current_observation
 
@@ -183,7 +188,7 @@ class MetricsEnv(AutonomousParkingEnv):
         super(MetricsEnv, self).__init__(env_type)
         self.env_type = env_type
         self.trajectory_index = 0  # Initialize trajectory index
-        self.traj_len = len(self.trajectories)
+        self.traj_len = len(self.metrics_instructions)
         # Initialize helpers
         self.image_loader = ImageLoader(self.env_type, self.image_raw_shape)
         self.data_reader = DataReader(self.env_type)
@@ -193,21 +198,21 @@ class MetricsEnv(AutonomousParkingEnv):
         self.image_data = self.image_loader.image_data
         self.render_image = self.image_loader.render_image
         self.parking_slots = self.data_reader.load_parking_slots()
-        self.trajectories = self.data_reader.load_trajectories()
-        # self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
+        # self.trajectories = self.data_reader.load_trajectories()
+        self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
 
     def getScan(self):
-        return self.target_instruction.scan
+        return self.experiment_id
 
     def reset(self, InsIndex=None):
 
         self.current_position = 1
         if InsIndex == None:
             # Select the next trajectory in sequence
-            self.target_instruction = self.trajectories[self.trajectory_index]
-            self.trajectory_index = (self.trajectory_index + 1) % len(self.trajectories)
+            self.target_instruction = self.metrics_instructions[self.trajectory_index]
+            self.trajectory_index = (self.trajectory_index + 1) % len(self.metrics_instructions)
         else:
-            self.target_instruction = self.trajectories[InsIndex]
+            self.target_instruction = self.metrics_instructions[InsIndex]
 
         instruction_tokens = self.tokenizer.encode(
             self.target_instruction.instruction, add_special_tokens=True,
@@ -216,9 +221,10 @@ class MetricsEnv(AutonomousParkingEnv):
         )
 
         self.inital_instruction = np.array(instruction_tokens)
-        self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
 
-        key = f"{self.target_instruction.park_id}/{self.target_instruction.scan}/{self.current_position:06d}.jpg"
+        # self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
+
+        key = f"{self.park_id}/{self.experiment_id}/{self.current_position:06d}.jpg"
         self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
