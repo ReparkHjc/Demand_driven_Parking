@@ -17,6 +17,7 @@ def split_multi_view_image(image_array):
 
     return front_img, left_img, right_img, back_img
 
+
 def combine_views(front, left, right, back):
     width, height = front.size
     combined = Image.new("RGB", (width * 4, height))
@@ -26,8 +27,8 @@ def combine_views(front, left, right, back):
     combined.paste(back, (width * 3, 0))
     return combined
 
-def get_view_image(img_np, view='right'):
 
+def get_view_image(img_np, view='right'):
     front_img, left_img, right_img, back_img = split_multi_view_image(img_np)
 
     view_map = {
@@ -35,11 +36,13 @@ def get_view_image(img_np, view='right'):
         'left': left_img,
         'right': right_img,
         'back': back_img,
+        'mutil': [front_img, left_img, right_img, back_img],
+        'side': [left_img, right_img],
         'combined': combine_views(front_img, left_img, right_img, back_img)
     }
 
     if view not in view_map:
-        raise ValueError(f"Invalid view '{view}'. Choose from 'front', 'left', 'right', 'back', 'combined'.")
+        raise ValueError(
+            f"Invalid view '{view}'. Choose from 'front', 'left', 'right', 'back', 'combined', 'mutil', 'side'.")
 
     return view_map[view]
-
