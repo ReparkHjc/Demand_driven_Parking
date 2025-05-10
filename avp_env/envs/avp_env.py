@@ -160,7 +160,12 @@ class MetricsVLLMEnv(AutonomousParkingEnv):
 
     def reset(self, InsIndex=None):
         self.current_position = 1
-        self.target_instruction = random.choice(self.trajectories)
+        if InsIndex == None:
+            # Select the next trajectory in sequence
+            self.target_instruction = self.trajectories[self.trajectory_index]
+            self.trajectory_index = (self.trajectory_index + 1) % len(self.trajectories)
+        else:
+            self.target_instruction = self.trajectories[InsIndex]
 
         self.inital_instruction = self.target_instruction.instruction
 
