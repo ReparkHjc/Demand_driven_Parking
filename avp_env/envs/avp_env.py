@@ -24,7 +24,7 @@ class AutonomousParkingEnv(gym.Env):
         self.render_image = self.image_loader.render_image
         self.parking_slots = self.data_reader.load_parking_slots()
         self.trajectories = self.data_reader.load_trajectories()
-        self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
+        # self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
 
         # Define observation space
         self.observation_space = spaces.Tuple((
@@ -189,7 +189,7 @@ class MetricsEnv(AutonomousParkingEnv):
         self.render_image = self.image_loader.render_image
         self.parking_slots = self.data_reader.load_parking_slots()
         self.trajectories = self.data_reader.load_trajectories()
-        self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
+        # self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
 
     def getScan(self):
         return self.target_instruction.scan
