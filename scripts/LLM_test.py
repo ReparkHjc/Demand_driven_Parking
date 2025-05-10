@@ -9,29 +9,35 @@ import os
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run AVP experiments and compute metrics.")
     parser.add_argument('--load', action='store_true', help='Whether to load old evaluation')
-    parser.add_argument('--instr_type', type=str, default='raw', help='name to instruction file')
-    parser.add_argument('--model', type=str, default='deepseek-vl-7b-chat', help='Name of model')
-    parser.add_argument('--view', type=str, default='right', help='View of camera from vehicle')
+    # parser.add_argument('--instr_type', type=str, default='raw', help='name to instruction file')
+    parser.add_argument('--instr_types', nargs='+', type=str, default=['raw'], help='List of instruction types')
+    # parser.add_argument('--model', type=str, default='deepseek-vl-7b-chat', help='Name of model')
+    parser.add_argument('--models', nargs='+', type=str, default=['deepseek-vl-7b-chat'], help='Name of model')
+    # parser.add_argument('--view', type=str, default='right', help='View of camera from vehicle')
+    parser.add_argument('--views', nargs='+', type=str, default=['right'], help='View of camera from vehicle')
     args = parser.parse_args()
 
-    instruction_path = f'../data/Command/{args.instr_type}_command.json'
-    output_file = f'../results/{args.model}/{args.view}/{args.instr_type}_command.json'
+    for instr_type in args.instr_types:
+        for model in args.models:
+            for view in args.views:
+                instruction_path = f'../data/Command/{instr_type}_command.json'
+                output_file = f'../results/{model}/{view}/{instr_type}_command.json'
 
-    output_dir = os.path.dirname(output_file)
-    os.makedirs(output_dir, exist_ok=True)
+                output_dir = os.path.dirname(output_file)
+                os.makedirs(output_dir, exist_ok=True)
 
-    env = MetricsVLLMEnv()
+                env = MetricsVLLMEnv()
 
-    if args.model == 'deepseek-vl-7b-chat':
-        agent = DSVL7BAgent()
-    else:
-        raise ValueError(f"Invalid model name '{args.model}'. Please check your input.")
+                if model == 'deepseek-vl-7b-chat':
+                    agent = DSVL7BAgent()
+                else:
+                    raise ValueError(f"Invalid model name '{model}'. Please check your input.")
 
-    if args.load:
-        experiments = load_experiments(output_file)
-    else:
-        instru_num = instru_len(instruction_path)
-        experiments = run_experiments(env, agent, instru_num, output_file, args.view)
+                if args.load:
+                    experiments = load_experiments(output_file)
+                else:
+                    instru_num = instru_len(instruction_path)
+                    experiments = run_experiments(env, agent, instru_num, output_file, view)
 
-    metrics = get_parking_metrics(experiments)
-    print("Metrics:", metrics)
+                metrics = get_parking_metrics(experiments)
+                print(f"Metrics for instr_type '{instr_type}', model '{model}', view '{view}':\n", metrics)
