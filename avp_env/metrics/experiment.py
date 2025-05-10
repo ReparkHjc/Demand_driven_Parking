@@ -22,7 +22,7 @@ def run_experiments(env, agent, instru_num, output_file, view):
                 json_file.write(",\n")
             json.dump(experiment, json_file, indent=4)
             experiments.append(experiment)
-            print(f'parking at {result_id}, {idx}/{instru_num}')
+            print(f'parking at {result_id}, {idx+1}/{instru_num}')
 
         json_file.write("\n]")
     return experiments
