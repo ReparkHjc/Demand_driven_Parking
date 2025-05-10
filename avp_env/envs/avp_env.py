@@ -7,9 +7,10 @@ import random
 from avp_env.agents.park_match import load_prefect_park
 
 class AutonomousParkingEnv(gym.Env):
-    def __init__(self, args=[]):
+    def __init__(self, env_type='train', args=[]):
         super(AutonomousParkingEnv, self).__init__()
-        self.env_type = 'train'
+        # self.env_type = 'train'
+        self.env_type = env_type
         self.image_raw_shape = (270, 480, 3)
         self.max_string_length = 512
         # self.image_shape = (4, 270, 480, 3)
@@ -160,8 +161,7 @@ class AutonomousParkingEnv(gym.Env):
 
 class MetricsVLLMEnv(AutonomousParkingEnv):
     def __init__(self, args = []):
-        super(MetricsVLLMEnv, self).__init__()
-        self.env_type = 'raw'
+        super(MetricsVLLMEnv, self).__init__(env_type='raw', args=args)
 
     def reset(self, InsIndex=None):
         self.current_position = 1
