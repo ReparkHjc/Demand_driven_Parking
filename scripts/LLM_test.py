@@ -15,7 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     instruction_path = f'../data/Command/{args.instr_type}_command.json'
-    output_file = f'../results/{args.model}/{args.instr_type}_command.json'
+    output_file = f'../results/{args.model}/{args.view}/{args.instr_type}_command.json'
 
     output_dir = os.path.dirname(output_file)
     os.makedirs(output_dir, exist_ok=True)
