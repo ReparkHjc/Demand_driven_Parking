@@ -146,10 +146,10 @@ class DSVL7BAgent:
                 "content": ""
             }
         ]
-
+        pil_images = image if isinstance(image, list) else [image]
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=image if isinstance(image, list) else [image],
+            images=pil_images,
             force_batchify=True
         ).to(self.model.device)
 
