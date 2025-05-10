@@ -6,7 +6,7 @@ import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
 from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
-# from deepseek_vl.utils.io import load_pil_images as vl_load_pil_images
+from deepseek_vl.utils.io import load_pil_images
 # from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
 
 from qwen_vl_utils import process_vision_info

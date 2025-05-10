@@ -169,8 +169,8 @@ class AutonomousParkingEnv(gym.Env):
         pass
 
 class MetricsVLLMEnv(AutonomousParkingEnv):
-    def __init__(self, args = []):
-        super(MetricsVLLMEnv, self).__init__(env_type='raw', args=args)
+    def __init__(self, env_type='raw', args = []):
+        super(MetricsVLLMEnv, self).__init__(env_type=env_type, args=args)
 
     def reset(self, InsIndex=None):
         self.current_position = 1
