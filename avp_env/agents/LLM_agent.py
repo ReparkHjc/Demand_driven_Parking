@@ -5,12 +5,12 @@ import os
 import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
-from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
+from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM as deepseek_VLChatProcessor, deepseek_MultiModalityCausalLM
 from deepseek_vl.utils.io import load_pil_images
 # from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
 
 from qwen_vl_utils import process_vision_info
-from janus.models import MultiModalityCausalLM, VLChatProcessor
+from janus.models import MultiModalityCausalLM, VLChatProcessor as janus_MultiModalityCausalLM, janus_VLChatProcessor
 # from janus.utils.io import load_pil_images
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
@@ -18,10 +18,10 @@ os.environ["TRANSFORMERS_OFFLINE"] = "1"  # 禁用在线检查
 
 class JanusAgent:
     def __init__(self, model_path="../../Janus-Pro-7B"):
-        self.processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_path)
+        self.processor: janus_VLChatProcessor = janus_VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
 
-        self.model: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
+        self.model: janus_MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
             model_path, trust_remote_code=True
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
@@ -125,9 +125,9 @@ class DeepseekVL2Agent:
 
 class DSVL7BAgent:
     def __init__(self, model_path="../../deepseek-vl-7b-chat"):
-        self.processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_path)
+        self.processor: deepseek_VLChatProcessor = deepseek_VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
-        self.model: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
+        self.model: deepseek_MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
             model_path, trust_remote_code=True
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
