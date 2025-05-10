@@ -6,12 +6,12 @@ import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
 from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
-from deepseek_vl.utils.io import load_pil_images
+# from deepseek_vl.utils.io import load_pil_images as vl_load_pil_images
 # from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
 
 from qwen_vl_utils import process_vision_info
 from janus.models import MultiModalityCausalLM, VLChatProcessor
-from janus.utils.io import load_pil_images
+# from janus.utils.io import load_pil_images
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
 os.environ["TRANSFORMERS_OFFLINE"] = "1"  # 禁用在线检查
@@ -36,11 +36,10 @@ class JanusAgent:
             {"role": "<|Assistant|>", "content": ""},
         ]
 
-        pil_images = load_pil_images(conversation)
 
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=pil_images,
+            images=image,
             force_batchify=True
         ).to(self.model.device)
 
@@ -92,11 +91,10 @@ class DeepseekVL2Agent:
             }
         ]
 
-        pil_images = load_pil_images(conversation)
 
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=pil_images,
+            images=image,
             force_batchify=True,
             system_prompt=""
         ).to(self.model.device)
