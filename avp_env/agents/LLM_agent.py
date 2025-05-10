@@ -39,7 +39,7 @@ class JanusAgent:
 
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=[image],
+            images=image if isinstance(image, list) else [image],
             force_batchify=True
         ).to(self.model.device)
 
@@ -94,7 +94,7 @@ class DeepseekVL2Agent:
 
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=image,
+            images=image if isinstance(image, list) else [image],
             force_batchify=True,
             system_prompt=""
         ).to(self.model.device)
