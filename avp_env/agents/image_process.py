@@ -25,3 +25,21 @@ def combine_views(front, left, right, back):
     combined.paste(right, (width * 2, 0))
     combined.paste(back, (width * 3, 0))
     return combined
+
+def get_view_image(img_np, view='right'):
+
+    front_img, left_img, right_img, back_img = split_multi_view_image(img_np)
+
+    view_map = {
+        'front': front_img,
+        'left': left_img,
+        'right': right_img,
+        'back': back_img,
+        'combined': combine_views(front_img, left_img, right_img, back_img)
+    }
+
+    if view not in view_map:
+        raise ValueError(f"Invalid view '{view}'. Choose from 'front', 'left', 'right', 'back', 'combined'.")
+
+    return view_map[view]
+

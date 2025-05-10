@@ -1,9 +1,7 @@
-from avp_env.envs.avp_env import MetricsVLLMEnv
-from avp_env.agents.LLM_agent import combineMultimodalLLMAgent
-from avp_env.agents.image_process import combine_views, split_multi_view_image
+from avp_env.agents.image_process import get_view_image
+from avp_env.agents.prompt_process import build_parking_prompt
 
-
-def get_result_id(env, agent, instructions_index=None):
+def get_result_id(env, agent, view, instructions_index=None):
     state = env.reset(instructions_index)
     done = False
     instruction = env.getTargetInstruction().instruction
@@ -11,10 +9,11 @@ def get_result_id(env, agent, instructions_index=None):
     while not done:
         position = env.getPosition()
         img_np = env.render()[0]  # HWC image as numpy
-        front_img, left_img, right_img, back_img = split_multi_view_image(img_np)
-        img = right_img
 
-        action = agent.get_action(img, instruction, position)
+        img = get_view_image(img_np, view)
+        prompt = build_parking_prompt(instruction, position, view)
+
+        action = agent.get_action(img, prompt)
         state, reward, done, info = env.step(action)
 
     last_slots = env.getCurrentParkingSlot()

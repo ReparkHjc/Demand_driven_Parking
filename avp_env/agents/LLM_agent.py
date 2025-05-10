@@ -1,6 +1,3 @@
-from PIL import Image
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
 import openai
 import base64
 import io
@@ -17,7 +14,7 @@ os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
 os.environ["TRANSFORMERS_OFFLINE"] = "1"  # 禁用在线检查
 
 
-class combineMultimodalLLMAgent:
+class DSVL7BAgent:
     def __init__(self, model_path="../../deepseek-vl-7b-chat"):
         self.processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
@@ -26,30 +23,12 @@ class combineMultimodalLLMAgent:
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
 
-    def get_action(self, image: Image.Image, instruction: str, position: int) -> int:
-        # 构造 prompt
-        prompt = f"""<image_placeholder>
-        You are an autonomous parking assistant. Your job is to make a decision based on the following inputs:
-        
-        - The current position of the vehicle is {position}.
-        - The image shows the current right side view from the vehicle.
-        - The parking instruction is: "{instruction}"
-        
-        You can choose one of the following actions:
-        0: Move forward.
-        1: Attempt to park on the left side.
-        2: Attempt to park on the right side.
-        
-        Based on the instruction and what you see in the image, what is the most appropriate action at this moment?
-        
-        Please respond with only a single number: 0, 1, or 2."""
-
-        # 构建多轮对话格式
+    def get_action(self, image: Image.Image, prompt: str) -> int:
         conversation = [
             {
                 "role": "User",
                 "content": prompt,
-                "images": [image]  # PIL.Image
+                "images": [image]
             },
             {
                 "role": "Assistant",
@@ -57,15 +36,12 @@ class combineMultimodalLLMAgent:
             }
         ]
 
-        # 准备图像和文本输入
-        # pil_images = load_pil_images(conversation)
         prepare_inputs = self.processor(
             conversations=conversation,
             images=[image],
             force_batchify=True
         ).to(self.model.device)
 
-        # 获取嵌入并生成输出
         inputs_embeds = self.model.prepare_inputs_embeds(**prepare_inputs)
         outputs = self.model.language_model.generate(
             inputs_embeds=inputs_embeds,
@@ -80,7 +56,6 @@ class combineMultimodalLLMAgent:
 
         answer = self.tokenizer.decode(outputs[0].cpu().tolist(), skip_special_tokens=True).strip()
 
-        # 尝试解析动作
         try:
             action = int(answer)
             if action in [0, 1, 2]:

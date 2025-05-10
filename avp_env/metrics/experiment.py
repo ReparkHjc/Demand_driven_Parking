@@ -2,13 +2,13 @@ import json
 from avp_env.metrics.env_runner import get_result_id
 from avp_env.metrics.utils import get_target_features
 
-def run_experiments(env, agent, instru_num, output_file="VLLM_results.json"):
+def run_experiments(env, agent, instru_num, output_file, view):
     experiments = []
     with open(output_file, 'w') as json_file:
         json_file.write("[\n")
 
         for idx in range(instru_num):
-            result_id, result_features = get_result_id(env, agent, instructions_index=idx)
+            result_id, result_features = get_result_id(env, agent, view, idx)
             target_id, target_features = get_target_features(env)
 
             experiment = {
