@@ -2,7 +2,7 @@
 
 def meets_criteria(slot, tags):
     for key, value in tags.items():
-        if slot.get(key) != value:
+        if getattr(slot, key, None) != value:
             return False
     return True
 
