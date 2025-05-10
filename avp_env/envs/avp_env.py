@@ -86,8 +86,17 @@ class AutonomousParkingEnv(gym.Env):
     def getCurrentParkingSlot(self):
         return self.CurrentParkingSlot
 
+    def getParkingSlotInfo(self):
+        return self.parking_slots
+
     def getTargetInstruction(self):
         return self.target_instruction
+
+    def getMatchingSlots(self):
+        return self.matching_slots
+
+    def getParkInfo(self):
+        return self.park_id, self.experiment_id, self.path_num
 
     def step(self, action):
 
