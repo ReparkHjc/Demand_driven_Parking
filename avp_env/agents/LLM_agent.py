@@ -170,6 +170,7 @@ class DSVL7BAgent:
         try:
             action = int(answer)
             if action in [0, 1, 2]:
+                print(action)
                 return action
         except:
             pass
