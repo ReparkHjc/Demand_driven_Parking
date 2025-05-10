@@ -3,7 +3,7 @@
 # See https://stackoverflow.com/a/60885212
 
 import pathlib
-from setuptools import setup
+from setuptools import setup, find_packages
 
 CWD = pathlib.Path(__file__).absolute().parent
 
@@ -19,4 +19,6 @@ def get_version():
     raise RuntimeError("bad version data in __init__.py")
 
 
-setup(version=get_version())
+setup(name="avp-env",
+      version=get_version(),
+      packages=find_packages(include=["avp_env", "avp_env.*"]), )
