@@ -2,7 +2,7 @@ from avp_env.metrics.metrics import get_parking_metrics
 from avp_env.metrics.utils import instru_len
 from avp_env.metrics.experiment import run_experiments, load_experiments
 from avp_env.envs.avp_env import MetricsVLLMEnv
-from avp_env.agents.LLM_agent import DSVL7BAgent, QwenVLAgent
+from avp_env.agents.LLM_agent import DSVL7BAgent, QwenVLAgent, DeepseekVL2Agent, JanusAgent
 import argparse
 import os
 
@@ -32,7 +32,10 @@ if __name__ == "__main__":
                     agent = DSVL7BAgent()
                 elif model == 'Qwen2.5-VL-7B-Instruct':
                     agent = QwenVLAgent()
-
+                elif model == 'deepseek-vl2-tiny':
+                    agent = DeepseekVL2Agent()
+                elif model == 'Janus-Pro-7B':
+                    agent = JanusAgent()
                 else:
                     raise ValueError(f"Invalid model name '{model}'. Please check your input.")
 
