@@ -31,7 +31,7 @@ class JanusAgent:
             {
                 "role": "<|User|>",
                 "content": prompt,
-                "images": [image],
+                "images": image if isinstance(image, list) else [image],
             },
             {"role": "<|Assistant|>", "content": ""},
         ]
@@ -139,7 +139,7 @@ class DSVL7BAgent:
             {
                 "role": "User",
                 "content": prompt,
-                "images": [image]
+                "images": image if isinstance(image, list) else [image]
             },
             {
                 "role": "Assistant",
@@ -149,7 +149,7 @@ class DSVL7BAgent:
 
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=[image],
+            images=image if isinstance(image, list) else [image],
             force_batchify=True
         ).to(self.model.device)
 
@@ -170,7 +170,6 @@ class DSVL7BAgent:
         try:
             action = int(answer)
             if action in [0, 1, 2]:
-                print(action)
                 return action
         except:
             pass
@@ -188,14 +187,16 @@ class QwenVLAgent:
         self.processor = AutoProcessor.from_pretrained(model_path)
 
     def get_action(self, image: Image.Image, prompt: str) -> int:
-        # 构建符合Qwen格式的message
+        images = image if isinstance(image, list) else [image]
+
+
+        content = [{"type": "image", "image": img} for img in images]
+        content.append({"type": "text", "text": prompt})
+
         messages = [
             {
                 "role": "user",
-                "content": [
-                    {"type": "image", "image": image},
-                    {"type": "text", "text": prompt},
-                ],
+                "content": content,
             }
         ]
 
