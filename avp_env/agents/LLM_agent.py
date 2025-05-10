@@ -39,7 +39,7 @@ class JanusAgent:
 
         prepare_inputs = self.processor(
             conversations=conversation,
-            images=image,
+            images=[image],
             force_batchify=True
         ).to(self.model.device)
 
