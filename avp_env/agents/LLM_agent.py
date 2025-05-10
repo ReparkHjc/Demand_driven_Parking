@@ -1,14 +1,16 @@
 import openai
 import base64
 import io
+import os
 
 import torch
 from PIL import Image
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
 from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
 from deepseek_vl.utils.io import load_pil_images
 
-import os
+from qwen_vl_utils import process_vision_info
+
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
 os.environ["TRANSFORMERS_OFFLINE"] = "1"  # 禁用在线检查
@@ -66,62 +68,61 @@ class DSVL7BAgent:
         return 0  # 默认返回前进
 
 
-class multiImgMultimodalLLMAgent:
-    def __init__(self, api_key: str):
-        openai.api_key = api_key
-        self.model = "gpt-4-vision-preview"
+class QwenVLAgent:
+    def __init__(self, model_path="../../Qwen2.5-VL-7B-Instruct"):
+        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            model_path,
+            torch_dtype=torch.bfloat16,
+            device_map="auto"
+        )
+        self.processor = AutoProcessor.from_pretrained(model_path)
 
-    def _encode_image(self, image: Image.Image) -> str:
-        """Convert PIL image to base64 string."""
-        buffer = io.BytesIO()
-        image.save(buffer, format="JPEG")
-        return base64.b64encode(buffer.getvalue()).decode()
-
-    def get_action(self, images: list, instruction: str, position: int) -> int:
-        """
-        images: [front, left, right, rear] as PIL Images
-        instruction: parking instruction (str)
-        position: current position (int)
-        """
-        assert len(images) == 4, "Expected 4 images: front, left, right, rear"
-
-        image_inputs = [
-            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self._encode_image(img)}"}}
-            for img in images
+    def get_action(self, image: Image.Image, prompt: str) -> int:
+        # 构建符合Qwen格式的message
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": image},
+                    {"type": "text", "text": prompt},
+                ],
+            }
         ]
 
-        prompt = {
-            "type": "text",
-            "text": (
-                f"You are an autonomous parking assistant.\n"
-                f"The vehicle is currently at position {position}.\n"
-                f"You are given four camera images from the vehicle:\n"
-                f"- Image 1: Front view\n"
-                f"- Image 2: Left view\n"
-                f"- Image 3: Right view\n"
-                f"- Image 4: Rear view\n\n"
-                f"Parking instruction: \"{instruction}\"\n\n"
-                f"Choose one action:\n"
-                f"0: Move forward\n"
-                f"1: Attempt to park on the left\n"
-                f"2: Attempt to park on the right\n\n"
-                f"Please respond with only a single number: 0, 1, or 2."
-            )
-        }
-
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=[{"role": "user", "content": [prompt] + image_inputs}],
-            max_tokens=10,
-            temperature=0.2,
+        # 构建文本模板
+        text = self.processor.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
         )
 
-        reply = response.choices[0].message.content.strip()
+        # 视觉信息预处理
+        image_inputs, _ = process_vision_info(messages)
+
+        # 构建最终输入
+        inputs = self.processor(
+            text=[text],
+            images=image_inputs,
+            padding=True,
+            return_tensors="pt"
+        ).to(self.model.device)
+
+        # 推理生成
+        generated_ids = self.model.generate(**inputs, max_new_tokens=10)
+        generated_ids_trimmed = [
+            out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+        ]
+
+        output_text = self.processor.batch_decode(
+            generated_ids_trimmed,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False
+        )[0].strip()
+
+        # 解析整数动作
         try:
-            action = int(reply)
+            action = int(output_text)
             if action in [0, 1, 2]:
                 return action
-        except ValueError:
-            print("⚠️ Could not parse action from LLM output:", reply)
+        except:
+            pass
 
-        return 0  # default fallback
+        return 0  # 默认返回前进
