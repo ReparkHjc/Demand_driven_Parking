@@ -159,7 +159,7 @@ class AutonomousParkingEnv(gym.Env):
         pass
 
 class MetricsVLLMEnv(AutonomousParkingEnv):
-    def __init__(self, env_type='train'):
+    def __init__(self, env_type='raw'):
         super(MetricsVLLMEnv, self).__init__(env_type)
 
     def reset(self, InsIndex=None):
