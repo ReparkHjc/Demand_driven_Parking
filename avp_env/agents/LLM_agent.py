@@ -5,12 +5,12 @@ import os
 import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
-from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM as deepseek_VLChatProcessor, deepseek_MultiModalityCausalLM
+from deepseek_vl.models import VLChatProcessor as deepseek_VLChatProcessor, MultiModalityCausalLM as deepseek_MultiModalityCausalLM
 from deepseek_vl.utils.io import load_pil_images
 # from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
 
 from qwen_vl_utils import process_vision_info
-from janus.models import MultiModalityCausalLM, VLChatProcessor as janus_MultiModalityCausalLM, janus_VLChatProcessor
+from janus.models import MultiModalityCausalLM as janus_MultiModalityCausalLM, VLChatProcessor as janus_VLChatProcessor
 # from janus.utils.io import load_pil_images
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
