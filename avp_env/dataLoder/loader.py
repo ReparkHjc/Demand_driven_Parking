@@ -66,6 +66,16 @@ class DataReader:
             park_id = park_num.split('_')[-1]  # '1'
 
             experiment_id = os.path.basename(experiment_path)  # 20240423
-            return park_id, experiment_id, park_num
+
+            # subfolder
+            first_subdir = next((os.path.join(experiment_path, d) for d in os.listdir(experiment_path)
+                                 if os.path.isdir(os.path.join(experiment_path, d))), None)
+
+            if first_subdir:
+                path_num = len(os.listdir(first_subdir))
+            else:
+                raise ValueError(f"Invalid folder '{experiment_path}'. Please check your input.")
+
+            return park_id, experiment_id, path_num
 
 

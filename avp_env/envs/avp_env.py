@@ -27,7 +27,7 @@ class AutonomousParkingEnv(gym.Env):
         self.parking_slots = self.data_reader.load_parking_slots()
         # self.trajectories = self.data_reader.load_trajectories()
         self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
-        self.park_id, self.experiment_id, self.park_num = self.data_reader.load_vision_path()
+        self.park_id, self.experiment_id, self.path_num = self.data_reader.load_vision_path()
 
 
         # Define observation space
@@ -92,15 +92,15 @@ class AutonomousParkingEnv(gym.Env):
     def step(self, action):
 
         # Execute action and return reward, next observation, whether to terminate, debugging information
-        if self.current_position > int(self.park_num):
+        if self.current_position > int(self.path_num):
             reward = -1
             done = True
             self.CurrentParkingSlot = []
-        elif action == 0 and self.current_position != int(self.park_num):
+        elif action == 0 and self.current_position != int(self.path_num):
             reward = 0
             self.current_position += 1
             done = False
-        elif action == 0 and self.current_position == int(self.park_num):
+        elif action == 0 and self.current_position == int(self.path_num):
             reward = -1
             done = True
             self.CurrentParkingSlot = []
