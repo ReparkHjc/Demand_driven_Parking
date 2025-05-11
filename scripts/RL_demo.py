@@ -6,13 +6,13 @@ from ray.rllib.algorithms.dqn import DQNConfig
 
 from gymnasium.envs.registration import register
 # Import custom environment
-from avp_env.envs.avp_env import AutonomousParkingEnv
+from avp_env.envs.avp_env import RllibEnv
 
-# Register custom environment
-register(
-    id='AutonomousParking',
-    entry_point='AVP_ENV:AutonomousParkingEnv',
-)
+# # Register custom environment
+# register(
+#     id='AutonomousParking',
+#     entry_point='AVP_ENV:AutonomousParkingEnv',
+# )
 
 # Initialise Ray
 ray.init(num_gpus=0)
@@ -41,8 +41,14 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
     algo_config = algo_config.training(gamma=0.9, lr=0.01)
     algo_config = algo_config.resources(num_gpus=0)
     algo_config = algo_config.rollouts(num_rollout_workers=num_workers)
-    algo_config = algo_config.environment(env=AutonomousParkingEnv)
-
+    # algo_config = algo_config.environment(env=AutonomousParkingEnv)
+    algo_config = algo_config.environment(
+        env=RllibEnv,
+        env_config={
+            "env_type": "train",
+            "args": []
+        }
+    )
     algo_config.replay_buffer_config["capacity"] = 2000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')

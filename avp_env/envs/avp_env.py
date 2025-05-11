@@ -168,6 +168,15 @@ class AutonomousParkingEnv(gym.Env):
 
         pass
 
+
+class RllibEnv(AutonomousParkingEnv):
+    def __init__(self, config=None):
+        config = config or {}
+        env_type = config.get("env_type", "train")
+        args = config.get("args", [])
+        super().__init__(env_type=env_type, args=args)
+
+
 class MetricsVLLMEnv(AutonomousParkingEnv):
     def __init__(self, env_type='raw', args = []):
         super(MetricsVLLMEnv, self).__init__(env_type=env_type, args=args)
