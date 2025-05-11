@@ -15,7 +15,7 @@ from avp_env.envs.avp_env import RllibEnv
 # )
 
 # Initialise Ray
-ray.init(num_gpus=0)
+ray.init(num_cpus=8, num_gpus=1)
 
 # Algorithm Configuration List
 algorithm_configs = {
@@ -28,7 +28,7 @@ conv_filters_1 = [
     (64, 4, 2),
     (64, 3, 1)
 ]
-num_workers = 1
+num_workers = 4
 # Total time steps trained
 total_timesteps = 100000
 
@@ -38,8 +38,12 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
     log_dir = f"../RL/logs/{algo_name}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
-    algo_config = algo_config.training(gamma=0.9, lr=0.01)
-    algo_config = algo_config.resources(num_gpus=0)
+    algo_config = algo_config.training(gamma=0.9, lr=1e-4,
+                                       double_q=True,
+                                       dueling=True,
+                                       prioritized_replay=True,
+                                       n_step=3, )
+    algo_config = algo_config.resources(num_gpus=1)
     algo_config = algo_config.rollouts(num_rollout_workers=num_workers)
     # algo_config = algo_config.environment(env=AutonomousParkingEnv)
     algo_config = algo_config.environment(
@@ -49,7 +53,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
             "args": []
         }
     )
-    algo_config.replay_buffer_config["capacity"] = 2000  # reduce replay buffer
+    algo_config.replay_buffer_config["capacity"] = 50000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
@@ -78,6 +82,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
         if timesteps % 10000 == 0:
             checkpoint = algo.save(checkpoint_dir)
             print(f"Checkpoint saved at: {checkpoint}")
+
 
 # Configure and run Benchmark for each online algorithm
 for algo_name, algo_config in algorithm_configs.items():
