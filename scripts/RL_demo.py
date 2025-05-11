@@ -34,8 +34,8 @@ total_timesteps = 100000
 
 
 def run_algorithm(algo_config, algo_name, total_timesteps):
-    checkpoint_dir = f"../checkpoints/{algo_name}"
-    log_dir = f"../logs/{algo_name}"
+    checkpoint_dir = f"../RL/checkpoints/{algo_name}"
+    log_dir = f"../RL/logs/{algo_name}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
     algo_config = algo_config.training(gamma=0.9, lr=0.01)
