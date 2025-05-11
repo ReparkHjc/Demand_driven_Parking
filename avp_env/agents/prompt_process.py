@@ -9,7 +9,7 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         - The parking instruction is: "{instruction}"
 
         You can choose one of the following actions:
-        0: Move forward.
+        0: Move the vehicle one step forward and refresh the perception image.
         1: Attempt to park on the left side if there is a parking spot centrally aligned with the left side view of the vehicle.
         2: Attempt to park on the right side if there is a parking spot centrally aligned with the right side view of the vehicle.
 
@@ -28,7 +28,7 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         - The parking instruction is: "{instruction}"
 
         You can choose one of the following actions:
-        0: Move forward.
+        0: Move the vehicle one step forward and refresh the perception image.
         1: Attempt to park on the left side if there is a parking spot centrally aligned with the left side view of the vehicle.
         2: Attempt to park on the right side if there is a parking spot centrally aligned with the right side view of the vehicle.
 
@@ -46,7 +46,7 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         - The parking instruction is: "{instruction}"
 
         You can choose one of the following actions:
-        0: Move forward.
+        0: Move the vehicle one step forward and refresh the perception image.
         1: Attempt to park on the left side if there is a parking spot centrally aligned with the left side view of the vehicle.
         2: Attempt to park on the right side if there is a parking spot centrally aligned with the right side view of the vehicle.
 
@@ -63,7 +63,7 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         - The parking instruction is: "{instruction}"
 
         You can choose one of the following actions:
-        0: Move forward.
+        0: Move the vehicle one step forward and refresh the perception image.
         1: Attempt to park on the left side if there is a parking spot centrally aligned with the left side view of the vehicle.
         2: Attempt to park on the right side if there is a parking spot centrally aligned with the right side view of the vehicle.
 
