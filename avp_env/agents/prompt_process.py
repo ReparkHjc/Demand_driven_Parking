@@ -17,14 +17,14 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
 
         Please respond with only a single number: 0, 1, or 2."""
     elif view == 'mutil':
-        return f"""<image_placeholder>
+        return f"""
         You are an autonomous parking assistant. Your job is to make a decision based on the following inputs:
 
         - The current position of the vehicle is {position}.
-        - The image shows the current view from front side of the vehicle: <image>\n
-        - The image shows the current view from left side of the vehicle: <image>\n 
-        - The image shows the current view from right side of the vehicle: <image>\n
-        - The image shows the current view from back side of the vehicle: <image>\n
+        - The image shows the current view from front side of the vehicle: <image_placeholder><image>\n
+        - The image shows the current view from left side of the vehicle: <image_placeholder><image>\n 
+        - The image shows the current view from right side of the vehicle: <image_placeholder><image>\n
+        - The image shows the current view from back side of the vehicle: <image_placeholder><image>\n
         - The parking instruction is: "{instruction}"
 
         You can choose one of the following actions:
@@ -37,12 +37,12 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
 
         Please respond with only a single number: 0, 1, or 2."""
     elif view == 'side':
-        return f"""<image_placeholder>
+        return f"""
         You are an autonomous parking assistant. Your job is to make a decision based on the following inputs:
 
         - The current position of the vehicle is {position}.
-        - The image shows the current view from left side of the vehicle: <image>\n 
-        - The image shows the current view from right side of the vehicle: <image>\n
+        - The image shows the current view from left side of the vehicle: <image_placeholder><image>\n 
+        - The image shows the current view from right side of the vehicle: <image_placeholder><image>\n
         - The parking instruction is: "{instruction}"
 
         You can choose one of the following actions:
