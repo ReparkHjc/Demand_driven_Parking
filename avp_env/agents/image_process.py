@@ -36,13 +36,13 @@ def get_view_image(img_np, view='right'):
         'left': left_img,
         'right': right_img,
         'back': back_img,
-        'mutil': [front_img, left_img, right_img, back_img],
+        'multi': [front_img, left_img, right_img, back_img],
         'side': [left_img, right_img],
         'combined': combine_views(front_img, left_img, right_img, back_img)
     }
 
     if view not in view_map:
         raise ValueError(
-            f"Invalid view '{view}'. Choose from 'front', 'left', 'right', 'back', 'combined', 'mutil', 'side'.")
+            f"Invalid view '{view}'. Choose from 'front', 'left', 'right', 'back', 'combined', 'multi', 'side'.")
 
     return view_map[view]
