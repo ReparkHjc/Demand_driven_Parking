@@ -9,7 +9,7 @@ from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneratio
 # from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
 
 from qwen_vl_utils import process_vision_info
-import janus
+import janus.models as janus_models
 import deepseek_vl.models as deepseek_models
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
@@ -19,10 +19,10 @@ class JanusAgent:
     def __init__(self, model_path="../../Janus-Pro-7B"):
         # from janus.models import MultiModalityCausalLM, VLChatProcessor
         # from janus.utils.io import load_pil_images
-        self.processor: janus.models.VLChatProcessor = janus.models.VLChatProcessor.from_pretrained(model_path)
+        self.processor: janus_models.VLChatProcessor = janus_models.VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
 
-        self.model: janus.models.MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
+        self.model: janus_models.MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
             model_path, trust_remote_code=True
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
