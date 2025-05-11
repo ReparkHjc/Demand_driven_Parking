@@ -9,19 +9,20 @@ from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneratio
 # from deepseek_vl2.models import DeepseekVLV2Processor, DeepseekVLV2ForCausalLM
 
 from qwen_vl_utils import process_vision_info
-
+import janus
+import deepseek_vl
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
 os.environ["TRANSFORMERS_OFFLINE"] = "1"  # 禁用在线检查
 
 class JanusAgent:
     def __init__(self, model_path="../../Janus-Pro-7B"):
-        from janus.models import MultiModalityCausalLM, VLChatProcessor
+        # from janus.models import MultiModalityCausalLM, VLChatProcessor
         # from janus.utils.io import load_pil_images
-        self.processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_path)
+        self.processor: janus.models.VLChatProcessor = janus.models.VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
 
-        self.model: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
+        self.model: janus.models.MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
             model_path, trust_remote_code=True
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
@@ -125,11 +126,11 @@ class DeepseekVL2Agent:
 
 class DSVL7BAgent:
     def __init__(self, model_path="../../deepseek-vl-7b-chat"):
-        from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
+        # from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
         # from deepseek_vl.utils.io import load_pil_images
-        self.processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_path)
+        self.processor: deepseek_vl.models.VLChatProcessor = deepseek_vl.models.VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
-        self.model: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
+        self.model: deepseek_vl.models.MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
             model_path, trust_remote_code=True
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
