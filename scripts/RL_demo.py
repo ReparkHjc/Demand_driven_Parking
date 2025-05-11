@@ -38,11 +38,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
     log_dir = f"../RL/logs/{algo_name}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
-    algo_config = algo_config.training(gamma=0.9, lr=1e-4,
-                                       double_q=True,
-                                       dueling=True,
-                                       prioritized_replay=True,
-                                       n_step=3, )
+    algo_config = algo_config.training(gamma=0.9, lr=1e-4)
     algo_config = algo_config.resources(num_gpus=1)
     algo_config = algo_config.rollouts(num_rollout_workers=num_workers)
     # algo_config = algo_config.environment(env=AutonomousParkingEnv)
