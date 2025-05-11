@@ -10,11 +10,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run AVP experiments and compute metrics.")
     parser.add_argument('--load', action='store_true', help='Whether to load old evaluation')
     # parser.add_argument('--instr_type', type=str, default='raw', help='name to instruction file')
-    parser.add_argument('--instr_types', nargs='+', type=str, default=['raw'], help='List of instruction types')
+    parser.add_argument('--instr_types', nargs='+', type=str, default=['raw','change','long','short','abstract'], help='List of instruction types')
     # parser.add_argument('--model', type=str, default='deepseek-vl-7b-chat', help='Name of model')
-    parser.add_argument('--models', nargs='+', type=str, default=['deepseek-vl-7b-chat'], help='Name of model')
+    parser.add_argument('--models', nargs='+', type=str, default=['deepseek-vl-7b-chat','Qwen2.5-VL-7B-Instruct','Janus-Pro-7B'], help='Name of model')
     # parser.add_argument('--view', type=str, default='right', help='View of camera from vehicle')
-    parser.add_argument('--views', nargs='+', type=str, default=['right'], help='View of camera from vehicle')
+    parser.add_argument('--views', nargs='+', type=str, default=['front', 'left', 'right', 'back', 'combined', 'multi', 'side'], help='View of camera from vehicle')
     args = parser.parse_args()
 
     for instr_type in args.instr_types:

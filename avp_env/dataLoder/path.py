@@ -12,6 +12,15 @@ class PathLoader:
             experiment_paths = ['../data/Vision/Park_1/20250422']
         elif self.env_type == 'raw':
             experiment_paths = ['../data/Vision/Park_1/20250422']
+        elif self.env_type == 'change':
+            experiment_paths = ['../data/Vision/Park_1/20250422']
+        elif self.env_type == 'abstract':
+            experiment_paths = ['../data/Vision/Park_1/20250422']
+        elif self.env_type == 'short':
+            experiment_paths = ['../data/Vision/Park_1/20250422']
+        elif self.env_type == 'long':
+            experiment_paths = ['../data/Vision/Park_1/20250422']
+
         else:
             raise ValueError(f"Invalid env_type '{self.env_type}'. Please check your input.")
         return experiment_paths

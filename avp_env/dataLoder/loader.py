@@ -35,14 +35,15 @@ class DataReader:
         return [Trajectory(traj_entry) for traj_entry in combined_traj_data]
 
     def load_metrics_instructions(self, env_type):
-        if env_type == 'train':
-            instruction_name = 'target_command.json'
-        elif env_type == 'test':
-            instruction_name = 'target_command.json'
-        elif env_type == 'raw':
-            instruction_name = 'raw_command.json'
-        else:
-            raise ValueError(f"Invalid env_type '{env_type}'. Please check your input.")
+        # if env_type == 'train':
+        #     instruction_name = 'target_command.json'
+        # elif env_type == 'test':
+        #     instruction_name = 'target_command.json'
+        # elif env_type == 'raw':
+        #     instruction_name = 'raw_command.json'
+        # else:
+        #     raise ValueError(f"Invalid env_type '{env_type}'. Please check your input.")
+        instruction_name = f"{env_type}_command.json"
         # instruction_data = self._load_json('../data/commands', instruction_name)
         instruction_data = self._load_json('../data/Command', instruction_name)
 
