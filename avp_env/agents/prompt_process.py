@@ -16,7 +16,7 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         Based on the instruction and what you see in the image, what is the most appropriate action at this moment?
 
         Please respond with only a single number: 0, 1, or 2."""
-    elif view == 'mutil':
+    elif view == 'multi':
         return f"""
         You are an autonomous parking assistant. Your job is to make a decision based on the following inputs:
 
@@ -54,7 +54,7 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         Based on the instruction and what you see in the image, what is the most appropriate action at this moment?
 
         Please respond with only a single number: 0, 1, or 2."""
-    else:
+    elif view == 'right' or view == 'left' or view == 'back' or view == 'front':
         return f"""<image_placeholder>
         You are an autonomous parking assistant. Your job is to make a decision based on the following inputs:
 
@@ -71,3 +71,6 @@ def build_parking_prompt(instruction: str, position: int, view: str) -> str:
         Based on the instruction and what you see in the image, what is the most appropriate action at this moment?
 
         Please respond with only a single number: 0, 1, or 2."""
+    else:
+        raise ValueError(
+            f"Invalid view '{view}'. Choose from 'front', 'left', 'right', 'back', 'combined', 'multi', 'side'.")
