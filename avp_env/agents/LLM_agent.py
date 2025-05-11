@@ -10,7 +10,7 @@ from transformers import AutoModelForCausalLM, Qwen2_5_VLForConditionalGeneratio
 
 from qwen_vl_utils import process_vision_info
 import janus
-import deepseek_vl
+import deepseek_vl.models as deepseek_models
 
 os.environ["HF_HUB_OFFLINE"] = "1"  # 强制使用本地文件
 os.environ["TRANSFORMERS_OFFLINE"] = "1"  # 禁用在线检查
@@ -128,9 +128,9 @@ class DSVL7BAgent:
     def __init__(self, model_path="../../deepseek-vl-7b-chat"):
         # from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
         # from deepseek_vl.utils.io import load_pil_images
-        self.processor: deepseek_vl.models.VLChatProcessor = deepseek_vl.models.VLChatProcessor.from_pretrained(model_path)
+        self.processor: deepseek_models.VLChatProcessor = deepseek_models.VLChatProcessor.from_pretrained(model_path)
         self.tokenizer = self.processor.tokenizer
-        self.model: deepseek_vl.models.MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
+        self.model: deepseek_models.MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(
             model_path, trust_remote_code=True
         )
         self.model = self.model.to(torch.bfloat16).cuda().eval()
