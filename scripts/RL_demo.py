@@ -8,6 +8,10 @@ from gymnasium.envs.registration import register
 # Import custom environment
 from avp_env.envs.avp_env import RllibEnv
 
+import warnings
+warnings.filterwarnings("ignore")
+
+
 # # Register custom environment
 # register(
 #     id='AutonomousParking',
@@ -49,7 +53,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
             "args": []
         }
     )
-    algo_config.replay_buffer_config["capacity"] = 50000  # reduce replay buffer
+    algo_config.replay_buffer_config["capacity"] = 20000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
