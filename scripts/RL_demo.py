@@ -45,7 +45,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
     algo_config = algo_config.environment(
         env=RllibEnv,
         env_config={
-            "env_type": "train",
+            "env_type": "raw",
             "args": []
         }
     )
