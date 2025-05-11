@@ -5,6 +5,8 @@ from avp_env.envs.avp_env import MetricsVLLMEnv
 from avp_env.agents.LLM_agent import DSVL7BAgent, QwenVLAgent, JanusAgent
 import argparse
 import os
+import gc
+import torch
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run AVP experiments and compute metrics.")
@@ -14,7 +16,7 @@ if __name__ == "__main__":
     # parser.add_argument('--model', type=str, default='deepseek-vl-7b-chat', help='Name of model')
     parser.add_argument('--models', nargs='+', type=str, default=['deepseek-vl-7b-chat','Qwen2.5-VL-7B-Instruct','Janus-Pro-7B'], help='Name of model')
     # parser.add_argument('--view', type=str, default='right', help='View of camera from vehicle')
-    parser.add_argument('--views', nargs='+', type=str, default=['front', 'left', 'right', 'back', 'combined', 'multi', 'side'], help='View of camera from vehicle')
+    parser.add_argument('--views', nargs='+', type=str, default=['front', 'left', 'right', 'combined', 'multi', 'side'], help='View of camera from vehicle')
     args = parser.parse_args()
 
     for instr_type in args.instr_types:
@@ -48,3 +50,8 @@ if __name__ == "__main__":
                 metrics = get_parking_metrics(experiments)
                 print("=" * 40, f"\nMetrics for instr_type '{instr_type}', model '{model}', view '{view}':\n", metrics,
                       "\n", "=" * 40)
+
+                del agent
+                del env
+                gc.collect()
+                torch.cuda.empty_cache()
