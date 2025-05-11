@@ -21,7 +21,7 @@ if __name__ == "__main__":
         for model in args.models:
             for view in args.views:
                 instruction_path = f'../data/Command/{instr_type}_command.json'
-                output_file = f'../results/{model}/{view}/{instr_type}_command.json'
+                output_file = f'../results/{model}/{view}/{instr_type}_result.json'
 
                 output_dir = os.path.dirname(output_file)
                 os.makedirs(output_dir, exist_ok=True)
