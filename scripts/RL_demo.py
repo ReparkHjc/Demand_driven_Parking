@@ -2,7 +2,10 @@ import ray
 import os
 # from ray import tune
 
+from ray.rllib.algorithms.ppo import PPOConfig
+
 from ray.rllib.algorithms.dqn import DQNConfig
+from rllib_a2c.a2c import A2C, A2CConfig
 
 from gymnasium.envs.registration import register
 # Import custom environment
@@ -21,7 +24,9 @@ ray.init(num_gpus=1, logging_level=logging.ERROR)
 
 # Algorithm Configuration List
 algorithm_configs = {
-    "DQN": DQNConfig()
+    # "DQN": DQNConfig(),
+    "PPO": PPOConfig(),
+    "A2C": A2CConfig(),
 }
 
 # Convolutional Filter Configuration
@@ -32,7 +37,7 @@ conv_filters_1 = [
 ]
 num_workers = 1
 # Total time steps trained
-total_timesteps = 50000
+total_timesteps = 48000
 
 
 def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
