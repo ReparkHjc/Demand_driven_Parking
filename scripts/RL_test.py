@@ -34,6 +34,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view):
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     experiment_name = f"{algo_name}_{view}_{timestamp}"
     results_dir = "./RL/results"
+    log_path = os.path.abspath(results_dir)
 
     # 应用配置
     algo_config = (
@@ -64,7 +65,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view):
         tune_config=TuneConfig(),
         run_config=RunConfig(
             name=experiment_name,
-            storage_path=results_dir,
+            storage_path=f"file://{log_path}",
             stop={"timesteps_total": total_timesteps},
             verbose=1,
             checkpoint_config=CheckpointConfig(
