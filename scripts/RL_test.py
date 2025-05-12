@@ -40,7 +40,9 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view):
         algo_config
         .training(gamma=0.9, lr=1e-4)
         .resources(num_gpus=1)
-        .rollouts(num_rollout_workers=num_workers)
+        .env_runners(
+            num_env_runners=num_workers,
+        )
         .environment(env=RllibEnv, env_config={"view": view})
         .framework("tf")  # 推荐 TF 以启用 TensorBoard
     )
