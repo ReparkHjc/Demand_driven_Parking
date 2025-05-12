@@ -15,6 +15,7 @@ import logging
 #     entry_point='AVP_ENV:AutonomousParkingEnv',
 # )
 view = 'side'
+resume = True
 # Initialise Ray
 ray.init(num_gpus=1, logging_level=logging.ERROR)
 
@@ -34,7 +35,7 @@ num_workers = 1
 total_timesteps = 50000
 
 
-def run_algorithm(algo_config, algo_name, total_timesteps, view):
+def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
     checkpoint_dir = f"../RL/checkpoints/{algo_name}/{view}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
@@ -63,6 +64,19 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view):
     algo = algo_config.build()
 
     timesteps = 0
+
+    if resume:
+        # 获取最近一次保存的 checkpoint 路径
+        checkpoints = [os.path.join(checkpoint_dir, name) for name in os.listdir(checkpoint_dir)]
+        checkpoints = [ckpt for ckpt in checkpoints if os.path.isdir(ckpt)]
+        if checkpoints:
+            latest_checkpoint = max(checkpoints, key=os.path.getmtime)
+            print(f"Restoring from checkpoint: {latest_checkpoint}")
+            algo.restore(latest_checkpoint)
+        else:
+            print("No checkpoint found to resume from.")
+
+
     while timesteps < total_timesteps:
         result = algo.train()
         timesteps = result["timesteps_total"]
@@ -82,6 +96,6 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view):
 
 # Configure and run Benchmark for each online algorithm
 for algo_name, algo_config in algorithm_configs.items():
-    run_algorithm(algo_config, algo_name, total_timesteps, view)
+    run_algorithm(algo_config, algo_name, total_timesteps, view, resume)
 
 ray.shutdown()
