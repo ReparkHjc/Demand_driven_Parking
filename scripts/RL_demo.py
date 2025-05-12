@@ -89,7 +89,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
         print("=*=" * 10)
 
         # Save checkpoints
-        if timesteps % 10000 == 0:
+        if timesteps % 3000 == 0:
             checkpoint = algo.save(checkpoint_dir)
             print(f"Checkpoint saved at: {checkpoint}")
 
