@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # )
 
 # Initialise Ray
-ray.init(num_cpus=8, num_gpus=1)
+ray.init(num_gpus=1)
 
 # Algorithm Configuration List
 algorithm_configs = {
@@ -54,7 +54,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
             "args": []
         }
     )
-    algo_config.replay_buffer_config["capacity"] = 5000  # reduce replay buffer
+    algo_config.replay_buffer_config["capacity"] = 4000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
