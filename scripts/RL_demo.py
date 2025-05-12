@@ -53,7 +53,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
         }
     )
     algo_config.replay_buffer_config.update({
-        "capacity": 5000,
+        "capacity": 2000,
         "storage_unit": "timesteps",  # 避免按 episode 存储
         "compress_observations": True
     })
