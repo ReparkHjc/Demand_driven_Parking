@@ -67,10 +67,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
         train_batch_size=50,
         lr=1e-4,
         gamma=0.9
-    ).rollouts(
-        rollout_fragment_length=20         # 每个 rollout worker 采样多少步
-    )
-
+        )
     algo_config = algo_config.framework('torch')
 
     # algo_config = algo_config.model(conv_filters=conv_filters)
