@@ -172,10 +172,8 @@ class AutonomousParkingEnv(gym.Env):
 class RllibEnv(AutonomousParkingEnv):
     def __init__(self, config=None):
         config = config or {}
-        env_type = config.get("env_type", "raw")
-        args = config.get("args", [])
         view = config.get("view", "multi")
-        super().__init__(env_type=env_type, args=args)
+        super().__init__()
         if view == "side":
             self.image_shape = (270, 480, 6)
             self.image_data = self.image_loader.image_side_data

@@ -14,7 +14,7 @@ import logging
 #     id='AutonomousParking',
 #     entry_point='AVP_ENV:AutonomousParkingEnv',
 # )
-env_type = 'side'
+view = 'side'
 # Initialise Ray
 ray.init(num_gpus=1, logging_level=logging.ERROR)
 
@@ -34,9 +34,9 @@ num_workers = 1
 total_timesteps = 50000
 
 
-def run_algorithm(algo_config, algo_name, total_timesteps, env_type):
-    checkpoint_dir = f"../RL/checkpoints/{algo_name}/{env_type}"
-    log_dir = f"../RL/logs/{algo_name}/{env_type}"
+def run_algorithm(algo_config, algo_name, total_timesteps, view):
+    checkpoint_dir = f"../RL/checkpoints/{algo_name}/{view}"
+    log_dir = f"../RL/logs/{algo_name}/{view}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
     algo_config = algo_config.training(gamma=0.9, lr=1e-4)
@@ -47,9 +47,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, env_type):
     algo_config = algo_config.environment(
         env=RllibEnv,
         env_config={
-            "env_type": env_type,
-            "view": "multi",
-            "args": []
+            "view": view,
         }
     )
     algo_config.replay_buffer_config.update({
@@ -91,6 +89,6 @@ def run_algorithm(algo_config, algo_name, total_timesteps, env_type):
 
 # Configure and run Benchmark for each online algorithm
 for algo_name, algo_config in algorithm_configs.items():
-    run_algorithm(algo_config, algo_name, total_timesteps, env_type)
+    run_algorithm(algo_config, algo_name, total_timesteps, view)
 
 ray.shutdown()
