@@ -14,7 +14,7 @@ import logging
 #     id='AutonomousParking',
 #     entry_point='AVP_ENV:AutonomousParkingEnv',
 # )
-view = 'side'
+view = 'multi'
 # Initialise Ray
 ray.init(num_gpus=1, logging_level=logging.ERROR)
 
