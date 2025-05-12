@@ -10,6 +10,7 @@ from avp_env.envs.avp_env import RllibEnv
 
 import warnings
 warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 # # Register custom environment
@@ -32,7 +33,7 @@ conv_filters_1 = [
     (64, 4, 2),
     (64, 3, 1)
 ]
-num_workers = 4
+num_workers = 2
 # Total time steps trained
 total_timesteps = 100000
 
@@ -75,7 +76,8 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
         rwd_mean = result['episode_reward_mean']
         len_mean = result['episode_len_mean']
         print("=*=" * 10)
-        print(f"{algo_name} training at timestep {timesteps}/{total_timesteps}: {result}")
+        # print(f"{algo_name} training at timestep {timesteps}/{total_timesteps}: {result}")
+        print(f"{algo_name} training at timestep {timesteps}/{total_timesteps}")
         print(f"|| Episode Reward Mean: {rwd_mean}, Episode Length Mean: {len_mean} ||")
 
         # Save checkpoints
