@@ -62,6 +62,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
             "storage_unit": "timesteps",  # 避免按 episode 存储
             "compress_observations": True
         })
+
     algo_config = algo_config.framework('torch')
 
     # algo_config = algo_config.model(conv_filters=conv_filters)
