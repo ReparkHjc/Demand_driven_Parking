@@ -7,11 +7,7 @@ from ray.rllib.algorithms.dqn import DQNConfig
 from gymnasium.envs.registration import register
 # Import custom environment
 from avp_env.envs.avp_env import RllibEnv
-
-import warnings
-warnings.filterwarnings("ignore")
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
+import logging
 
 # # Register custom environment
 # register(
@@ -20,7 +16,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # )
 
 # Initialise Ray
-ray.init(num_gpus=1)
+ray.init(num_gpus=1, logging_level=logging.ERROR)
 
 # Algorithm Configuration List
 algorithm_configs = {
@@ -45,16 +41,22 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
     os.makedirs(checkpoint_dir, exist_ok=True)
     algo_config = algo_config.training(gamma=0.9, lr=1e-4)
     algo_config = algo_config.resources(num_gpus=1)
-    algo_config = algo_config.rollouts(num_rollout_workers=num_workers)
+    algo_config = algo_config.rollouts(num_rollout_workers=num_workers,episode_horizon=200)
+
     # algo_config = algo_config.environment(env=AutonomousParkingEnv)
     algo_config = algo_config.environment(
         env=RllibEnv,
         env_config={
             "env_type": "raw",
+            "view": "multi",
             "args": []
         }
     )
-    algo_config.replay_buffer_config["capacity"] = 5000  # reduce replay buffer
+    algo_config.replay_buffer_config.update({
+        "capacity": 5000,
+        "storage_unit": "timesteps",  # 避免按 episode 存储
+        "compress_observations": True
+    })
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
