@@ -65,6 +65,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
     elif algo_name == "PPO":
         algo_config = algo_config.training(
         train_batch_size=50,
+        sgd_minibatch_size=32,
         lr=1e-4,
         gamma=0.9
         )
