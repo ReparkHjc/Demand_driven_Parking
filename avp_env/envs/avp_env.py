@@ -7,7 +7,7 @@ import random
 from avp_env.agents.park_match import load_prefect_park
 
 class AutonomousParkingEnv(gym.Env):
-    def __init__(self, env_type='train', args=[]):
+    def __init__(self, env_type='raw', args=[]):
         super(AutonomousParkingEnv, self).__init__()
         # self.env_type = 'train'
         self.env_type = env_type
