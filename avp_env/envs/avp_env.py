@@ -177,6 +177,11 @@ class RllibEnv(AutonomousParkingEnv):
         if view == "side":
             self.image_shape = (270, 480, 6)
             self.image_data = self.image_loader.image_side_data
+            self.observation_space = spaces.Tuple((
+                spaces.Box(low=0, high=255, shape=self.image_shape, dtype=np.uint8),  # 4张图
+                spaces.Box(low=0, high=99999, shape=(self.max_string_length,), dtype=np.int64)  # 指令token
+            ))
+
 
 class MetricsVLLMEnv(AutonomousParkingEnv):
     def __init__(self, env_type='raw', args = []):
