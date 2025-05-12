@@ -26,7 +26,7 @@ ray.init(num_gpus=1, logging_level=logging.ERROR)
 algorithm_configs = {
     # "DQN": DQNConfig(),
     "PPO": PPOConfig(),
-    "A2C": A2CConfig(),
+    # "A2C": A2CConfig(),
 }
 
 # Convolutional Filter Configuration
