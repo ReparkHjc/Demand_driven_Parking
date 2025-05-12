@@ -33,7 +33,7 @@ conv_filters_1 = [
     (64, 4, 2),
     (64, 3, 1)
 ]
-num_workers = 2
+num_workers = 1
 # Total time steps trained
 total_timesteps = 100000
 
@@ -54,7 +54,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
             "args": []
         }
     )
-    algo_config.replay_buffer_config["capacity"] = 2000  # reduce replay buffer
+    algo_config.replay_buffer_config["capacity"] = 5000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
