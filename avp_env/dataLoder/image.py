@@ -10,6 +10,7 @@ class ImageLoader:
         self.image_shape = image_shape
         self.image_data = self._load_images()
         self.render_image = self._load_render_images()
+        self.image_side_data = self._load_side_images()
 
     def _load_images(self):
         image_data = {}
