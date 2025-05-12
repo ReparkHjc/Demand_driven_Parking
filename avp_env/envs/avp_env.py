@@ -129,7 +129,7 @@ class AutonomousParkingEnv(gym.Env):
         )
 
         info = {}
-        print(f"Step: done={done}, reward={reward}")
+        # print(f"Step: done={done}, reward={reward}")
 
         return self.current_observation, reward, done, info
 
