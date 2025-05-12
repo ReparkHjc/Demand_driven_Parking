@@ -44,9 +44,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
     checkpoint_dir = f"../RL/checkpoints/{algo_name}/{view}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
-    algo_config = algo_config.training(gamma=0.9, lr=1e-4,replay_buffer_config={
-            "capacity": 2000
-        })
+    algo_config = algo_config.training(gamma=0.9, lr=1e-4)
     algo_config = algo_config.resources(num_gpus=1)
     algo_config = algo_config.rollouts(num_rollout_workers=num_workers)
 
@@ -57,14 +55,13 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
             "view": view,
         }
     )
-    # algo_config.replay_buffer_config.update({
-    #     "capacity": 2000,
-    #     "storage_unit": "timesteps",  # 避免按 episode 存储
-    #     "compress_observations": True
-    # })
-    if algo_name == "SAC":
-        algo_config = algo_config.training()
 
+    if algo_name == "DQN":
+        algo_config.replay_buffer_config.update({
+            "capacity": 2000,
+            "storage_unit": "timesteps",  # 避免按 episode 存储
+            "compress_observations": True
+        })
     algo_config = algo_config.framework('torch')
 
     # algo_config = algo_config.model(conv_filters=conv_filters)
