@@ -36,7 +36,6 @@ total_timesteps = 50000
 
 def run_algorithm(algo_config, algo_name, total_timesteps, view):
     checkpoint_dir = f"../RL/checkpoints/{algo_name}/{view}"
-    log_dir = f"../RL/logs/{algo_name}/{view}"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
     algo_config = algo_config.training(gamma=0.9, lr=1e-4)
@@ -60,12 +59,6 @@ def run_algorithm(algo_config, algo_name, total_timesteps, view):
     algo_config = algo_config.framework('torch')
     # algo_config = algo_config.model(conv_filters=conv_filters)
     algo_config.model["conv_filters"] = conv_filters_1
-
-    # Add logger config for TensorBoard
-    algo_config = algo_config.debugging(log_level="INFO", logger_config={
-        "type": "ray.tune.logger.UnifiedLogger",
-        "logdir": log_dir,
-    })
 
     algo = algo_config.build()
 
