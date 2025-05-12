@@ -23,7 +23,7 @@ class AutonomousParkingEnv(gym.Env):
 
         # Initialize environment data
         self.image_data = self.image_loader.image_data
-        self.render_image = self.image_loader.render_image
+        # self.render_image = self.image_loader.render_image
         self.parking_slots = self.data_reader.load_parking_slots()
         # self.trajectories = self.data_reader.load_trajectories()
         self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
@@ -68,7 +68,7 @@ class AutonomousParkingEnv(gym.Env):
         # self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
 
         key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
-        self.render_observation = self.render_image[key]
+        # self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
         )
@@ -123,7 +123,7 @@ class AutonomousParkingEnv(gym.Env):
 
         key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
 
-        self.render_observation = self.render_image[key]
+        # self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
         )
@@ -158,11 +158,11 @@ class AutonomousParkingEnv(gym.Env):
 
         return reward
 
-    def render(self, mode='human'):
-        self.render_observation[:, :, [0, 2]] = self.render_observation[:, :, [2, 0]]
-        # Optional rendering method for visualising the state of the environment
-        img, command = self.render_observation, self.target_instruction.instruction
-        return img, command
+    # def render(self, mode='human'):
+    #     self.render_observation[:, :, [0, 2]] = self.render_observation[:, :, [2, 0]]
+    #     # Optional rendering method for visualising the state of the environment
+    #     img, command = self.render_observation, self.target_instruction.instruction
+    #     return img, command
 
     def close(self):
 
@@ -176,7 +176,9 @@ class RllibEnv(AutonomousParkingEnv):
         args = config.get("args", [])
         view = config.get("view", "multi")
         super().__init__(env_type=env_type, args=args)
-
+        if view == "side":
+            self.image_shape = (270, 480, 6)
+            self.image_data = self.image_loader.image_side_data
 
 class MetricsVLLMEnv(AutonomousParkingEnv):
     def __init__(self, env_type='raw', args = []):
@@ -194,7 +196,7 @@ class MetricsVLLMEnv(AutonomousParkingEnv):
         self.inital_instruction = self.target_instruction.instruction
         print(self.inital_instruction)
         key = f"{self.park_id}/{self.experiment_id}/{(self.current_position-1):06d}.jpg"
-        self.render_observation = self.render_image[key]
+        # self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
         )
@@ -216,7 +218,7 @@ class MetricsEnv(AutonomousParkingEnv):
 
         # Initialize environment data
         self.image_data = self.image_loader.image_data
-        self.render_image = self.image_loader.render_image
+        # self.render_image = self.image_loader.render_image
         self.parking_slots = self.data_reader.load_parking_slots()
         # self.trajectories = self.data_reader.load_trajectories()
         self.metrics_instructions = self.data_reader.load_metrics_instructions(self.env_type)
@@ -245,7 +247,7 @@ class MetricsEnv(AutonomousParkingEnv):
         # self.perfect_trajectory = self.get_perfect_trajectory(self.target_instruction)
 
         key = f"{self.park_id}/{self.experiment_id}/{self.current_position:06d}.jpg"
-        self.render_observation = self.render_image[key]
+        # self.render_observation = self.render_image[key]
         self.current_observation = (
             self.image_data[key], self.inital_instruction
         )
