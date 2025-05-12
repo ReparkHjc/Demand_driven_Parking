@@ -54,7 +54,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
             "args": []
         }
     )
-    algo_config.replay_buffer_config["capacity"] = 7000  # reduce replay buffer
+    algo_config.replay_buffer_config["capacity"] = 5000  # reduce replay buffer
 
     # algo_config = algo_config.environment(env='AutonomousParking-v6')
     algo_config = algo_config.framework('torch')
@@ -79,6 +79,7 @@ def run_algorithm(algo_config, algo_name, total_timesteps):
         # print(f"{algo_name} training at timestep {timesteps}/{total_timesteps}: {result}")
         print(f"{algo_name} training at timestep {timesteps}/{total_timesteps}")
         print(f"|| Episode Reward Mean: {rwd_mean}, Episode Length Mean: {len_mean} ||")
+        print("=*=" * 10)
 
         # Save checkpoints
         if timesteps % 10000 == 0:
