@@ -102,7 +102,7 @@ class AutonomousParkingEnv(gym.Env):
 
         # Execute action and return reward, next observation, whether to terminate, debugging information
         if self.current_position > int(self.path_num):
-            reward = -1
+            reward = -2
             done = True
             self.CurrentParkingSlot = []
         elif action == 0 and self.current_position != int(self.path_num):
