@@ -17,15 +17,15 @@ import logging
 #     id='AutonomousParking',
 #     entry_point='AVP_ENV:AutonomousParkingEnv',
 # )
-view = 'side'
+view = 'multi'
 resume = True
 # Initialise Ray
 ray.init(num_gpus=1, logging_level=logging.ERROR)
 
 # Algorithm Configuration List
 algorithm_configs = {
-    # "DQN": DQNConfig(),
     "PPO": PPOConfig(),
+    "DQN": DQNConfig(),
     # "A2C": A2CConfig(),
 }
 
