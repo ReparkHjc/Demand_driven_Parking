@@ -37,7 +37,7 @@ conv_filters_1 = [
 ]
 num_workers = 1
 # Total time steps trained
-total_timesteps = 48000
+total_timesteps = 30000
 
 
 def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
