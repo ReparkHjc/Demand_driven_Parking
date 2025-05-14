@@ -24,7 +24,7 @@ ray.init(num_gpus=1, logging_level=logging.ERROR)
 
 # Algorithm Configuration List
 algorithm_configs = {
-    "PPO": PPOConfig(),
+    # "PPO": PPOConfig(),
     "DQN": DQNConfig(),
     # "A2C": A2CConfig(),
 }
@@ -37,7 +37,7 @@ conv_filters_1 = [
 ]
 num_workers = 1
 # Total time steps trained
-total_timesteps = 30000
+total_timesteps = 50000
 
 
 def run_algorithm(algo_config, algo_name, total_timesteps, view, resume=False):
