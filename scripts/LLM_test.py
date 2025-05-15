@@ -18,6 +18,7 @@ if __name__ == "__main__":
     # parser.add_argument('--view', type=str, default='right', help='View of camera from vehicle')
     parser.add_argument('--views', nargs='+', type=str, default=['front', 'left', 'right', 'combined', 'multi', 'side'], help='View of camera from vehicle')
     args = parser.parse_args()
+    log_file_path = "metrics_results.txt"
 
     for instr_type in args.instr_types:
         for model in args.models:
@@ -48,8 +49,17 @@ if __name__ == "__main__":
                     experiments = run_experiments(env, agent, instru_num, output_file, view)
 
                 metrics = get_parking_metrics(experiments)
-                print("=" * 40, f"\nMetrics for instr_type '{instr_type}', model '{model}', view '{view}':\n", metrics,
-                      "\n", "=" * 40)
+                log_text = (
+                        "=" * 40 +
+                        f"\nMetrics for instr_type '{instr_type}', model '{model}', view '{view}':\n" +
+                        f"{metrics}\n" +
+                        "=" * 40
+                )
+                print(log_text)
+
+                if args.load:
+                    with open(log_file_path, "w") as f:
+                        f.write(log_text + "\n")  # 写入文件
 
                 del agent
                 del env
