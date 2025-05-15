@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # parser.add_argument('--view', type=str, default='right', help='View of camera from vehicle')
     parser.add_argument('--views', nargs='+', type=str, default=['front', 'left', 'right', 'combined', 'multi', 'side'], help='View of camera from vehicle')
     args = parser.parse_args()
-    log_file_path = "metrics_results.txt"
+    log_file_path = "../results/metrics_results.txt"
 
     for instr_type in args.instr_types:
         for model in args.models:
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 print(log_text)
 
                 if args.load:
-                    with open(log_file_path, "w") as f:
+                    with open(log_file_path, "a") as f:
                         f.write(log_text + "\n")  # 写入文件
 
                 del agent
