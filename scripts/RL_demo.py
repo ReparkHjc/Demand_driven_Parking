@@ -24,8 +24,8 @@ ray.init(num_gpus=1, logging_level=logging.ERROR)
 
 # Algorithm Configuration List
 algorithm_configs = {
-    # "PPO": PPOConfig(),
-    "DQN": DQNConfig(),
+    "PPO": PPOConfig(),
+    # "DQN": DQNConfig(),
     # "A2C": A2CConfig(),
 }
 
