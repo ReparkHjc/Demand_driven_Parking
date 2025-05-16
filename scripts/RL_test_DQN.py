@@ -5,6 +5,7 @@ import json
 import zipfile
 import os
 from ray.rllib.algorithms.ppo import PPOConfig
+from ray.rllib.algorithms.dqn import DQNConfig
 
 def getResultID(env, agent, instructions_index=None):
 
@@ -36,7 +37,8 @@ def get_experiment(env, agent, instru_num):
         # target_id = getTargetID(env)
 
         experiment = {
-            "TestScenarioID": env.getScan(),
+            # "TestScenarioID": env.getScan(),
+            "TestScenarioID": 20250422,
             "TestInstructionID": instructions_index,
             "VLPDecisionPositionID": result_id
         }
@@ -54,7 +56,7 @@ if __name__ == "__main__":
     # 创建 AutonomousParkingEnv 环境实例
     env = RllibEnv()
     # Algorithm Configuration List
-    algo_config = PPOConfig()
+    algo_config = DQNConfig()
 
     # Convolutional Filter Configuration
     conv_filters_1 = [
@@ -63,7 +65,7 @@ if __name__ == "__main__":
         (64, 3, 1)
     ]
     view = 'multi'
-    checkpoint_path = f"../RL/checkpoints/PPO/{view}/checkpoint_000300"
+    checkpoint_path = f"../RL/checkpoints/DQN/{view}/checkpoint_000300"
 
     os.makedirs(checkpoint_path, exist_ok=True)
     algo_config = algo_config.resources(num_gpus=1)
