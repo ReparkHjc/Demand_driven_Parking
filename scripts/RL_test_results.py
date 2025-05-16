@@ -52,7 +52,7 @@ def instru_len(instruction_path):
 
 if __name__ == "__main__":
     # 创建 AutonomousParkingEnv 环境实例
-    env = MetricsEnv()
+    env = RllibEnv()
     # Algorithm Configuration List
     algo_config = PPOConfig()
 
