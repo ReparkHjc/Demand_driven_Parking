@@ -63,7 +63,7 @@ if __name__ == "__main__":
         (64, 3, 1)
     ]
     view = 'multi'
-    checkpoint_path = f"../RL/checkpoints/PPO/{view}/30000/checkpoint_000030"
+    checkpoint_path = f"../RL/checkpoints/PPO/{view}/checkpoint_000030"
 
     os.makedirs(checkpoint_path, exist_ok=True)
     algo_config = algo_config.resources(num_gpus=1)
