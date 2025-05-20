@@ -12,12 +12,7 @@ from gymnasium.envs.registration import register
 from avp_env.envs.avp_env import RllibEnv
 import logging
 
-# # Register custom environment
-# register(
-#     id='AutonomousParking',
-#     entry_point='AVP_ENV:AutonomousParkingEnv',
-# )
-view = 'right'
+view = 'side'
 resume = True
 # Initialise Ray
 ray.init(num_gpus=1, logging_level=logging.ERROR)
@@ -25,7 +20,7 @@ ray.init(num_gpus=1, logging_level=logging.ERROR)
 # Algorithm Configuration List
 algorithm_configs = {
     "PPO": PPOConfig(),
-    # "DQN": DQNConfig(),
+    "DQN": DQNConfig(),
     # "A2C": A2CConfig(),
 }
 

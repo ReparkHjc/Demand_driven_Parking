@@ -1,85 +1,69 @@
-import ray
+import numpy as np
+from avp_env.envs.avp_env import MetricsEnv, RllibEnv
+from avp_env.agents.rule import RulebasedAgent
+import json
+import zipfile
 import os
-import datetime
-from ray import tune
-from ray.tune import TuneConfig, RunConfig
+from ray.rllib.algorithms.ppo import PPOConfig
 from ray.rllib.algorithms.dqn import DQNConfig
-from avp_env.envs.avp_env import RllibEnv
-import logging
-from ray.air.config import CheckpointConfig
+from avp_env.metrics.experiment import run_rl_experiments
+from avp_env.metrics.metrics import get_parking_metrics
 
-# 配置参数
-view = 'side'
-ray.init(num_gpus=1, logging_level=logging.ERROR)
+def instru_len(instruction_path):
+    with open(instruction_path, 'r') as f:
+        instruction_data = json.load(f)
+    return len(instruction_data)
 
-# 算法列表
-algorithm_configs = {
-    "DQN": DQNConfig()
-}
+if __name__ == "__main__":
+    # 创建 AutonomousParkingEnv 环境实例
+    env = RllibEnv()
+    # Algorithm Configuration List
+    algorithm_configs = {
+        "PPO": PPOConfig(),
+        "DQN": DQNConfig(),
+        # "A2C": A2CConfig(),
+    }
+    for algo_name, algo_config in algorithm_configs.items():
+        # Convolutional Filter Configuration
+        conv_filters_1 = [
+            (32, 8, 4),
+            (64, 4, 2),
+            (64, 3, 1)
+        ]
+        view = 'multi'
+        checkpoint_path = f"../RL/checkpoints/{algo_name}/{view}/30000/checkpoint_000300"
 
-# 模型卷积层设置
-conv_filters_1 = [
-    (32, 8, 4),
-    (64, 4, 2),
-    (64, 3, 1)
-]
+        os.makedirs(checkpoint_path, exist_ok=True)
+        algo_config = algo_config.resources(num_gpus=1)
+        algo_config = algo_config.rollouts(num_rollout_workers=1)
 
-# 总训练步数
-total_timesteps = 50000
-num_workers = 1
-
-
-def run_algorithm(algo_config, algo_name, total_timesteps, view):
-    # 日志 & checkpoint 路径
-    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    experiment_name = f"{algo_name}_{view}_{timestamp}"
-    results_dir = "./RL/results"
-    log_path = os.path.abspath(results_dir)
-
-    # 应用配置
-    algo_config = (
-        algo_config
-        .training(gamma=0.9, lr=1e-4)
-        .resources(num_gpus=1)
-        .env_runners(
-            num_env_runners=num_workers,
+        # algo_config = algo_config.environment(env=AutonomousParkingEnv)
+        algo_config = algo_config.environment(
+            env=RllibEnv,
+            env_config={
+                "view": view,
+            }
         )
-        .environment(env=RllibEnv, env_config={"view": view})
-        .framework("tf")  # 推荐 TF 以启用 TensorBoard
-    )
+        algo = algo_config.build()
+        algo.restore(checkpoint_path)
 
-    # 模型结构配置
-    algo_config.model["conv_filters"] = conv_filters_1
+        instruction_path = '../data/Command/test_command.json'
+        instru_num = instru_len(instruction_path)
+        output_file = f'../results/RL/{algo_name}_result.json'
+        log_file_path = f"../results/RL/{algo_name}_result.txt"
 
-    # Replay Buffer 配置
-    algo_config.replay_buffer_config.update({
-        "capacity": 2000,
-        "storage_unit": "timesteps",
-        "compress_observations": True
-    })
+        experiments = run_rl_experiments(env, algo, instru_num, output_file, view)
 
-    # 启动 Tuner（推荐方式）
-    tuner = tune.Tuner(
-        trainable=algo_name,
-        param_space=algo_config.to_dict(),
-        tune_config=TuneConfig(),
-        run_config=RunConfig(
-            name=experiment_name,
-            storage_path=f"file://{log_path}",
-            stop={"timesteps_total": total_timesteps},
-            verbose=1,
-            checkpoint_config=CheckpointConfig(
-                checkpoint_frequency=2000,
-            ),
+        metrics = get_parking_metrics(experiments)
+
+        log_text = (
+                "=" * 40 +
+                f"\nMetrics for agent '{algo_name}', view '{view}':\n" +
+                f"{metrics}\n" +
+                "=" * 40
         )
-    )
-
-    results = tuner.fit()
-    print(f"Training complete for {algo_name}. Results at: {results_dir}/{experiment_name}")
+        print(log_text)
 
 
-# === 执行所有算法 ===
-for algo_name, algo_config in algorithm_configs.items():
-    run_algorithm(algo_config, algo_name, total_timesteps, view)
-
-ray.shutdown()
+        with open(log_file_path, "a") as f:
+            f.write(log_text + "\n")  # 写入文件

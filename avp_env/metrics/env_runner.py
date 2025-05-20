@@ -28,3 +28,25 @@ def get_result_id(env, agent, view, instructions_index=None):
 
     result_id = last_slots[0].ParkingID if last_slots else []
     return result_id, result_features
+
+def get_rl_result_id(env, agent, view, instructions_index=None):
+    state = env.reset(instructions_index)
+    done = False
+
+    while not done:
+        action = agent.compute_single_action(state, explore=False)
+
+        state, reward, done, info = env.step(action)
+
+    last_slots = env.getCurrentParkingSlot()
+    path_id = env.getPosition()
+    loc_id = action
+
+    result_features = {
+        "path_id": path_id,
+        "loc_id": loc_id,
+        "distance": path_id,
+    }
+
+    result_id = last_slots[0].ParkingID if last_slots else []
+    return result_id, result_features
